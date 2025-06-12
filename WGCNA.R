@@ -1,16 +1,30 @@
 # Set up differential expression and remove genes that do not have at least 1 CPM in at least 2 samples   
+# Hajra Sohail
+# 2025-06-12
+
 
 # SETUP ------------------------------------------------------------------------------------------
 
-# 1: Download counts.Rdata and meta.Rdata from Github
-# 2: Set your working directory in line 7
+# 1: Set your working directory in the "" below
 
 workdir = ""
 setwd(workdir)
 
+# 2: Install R packages properly compatible with this project
+
+install.packages("renv")
+renv::restore() # TEST THIS!
+
+# 3: Install libraries for this R file
+
 library(limma)
 library(edgeR)
 library(data.table)
+library(dplyr) 
+library(biomaRt)
+
+
+# 2: Download counts.Rdata and meta.Rdata from Github. Move them into your working directory, then load the files
 
 load("counts.Rdata")
 load("meta.Rdata")
@@ -156,7 +170,6 @@ for (col in colnames(summa.fit1a)) {
 }
 
 #annotate with mgi_symbols
-library(biomaRt)
 mart = useMart("ensembl") 
 mart = useDataset("mmusculus_gene_ensembl", mart) 
 ann = getBM(mart = mart, attributes = c("ensembl_gene_id", "mgi_symbol", "gene_biotype", "description"), filters = "ensembl_gene_id", values = rownames(logcpm))
@@ -196,7 +209,7 @@ for (i in 1:length(target)) {
   flname <- paste0(getwd(), "/DEgene_summary_", target[i], ".txt")
   write.table(DEoutp[[target[i]]], file = flname, sep = "\t", row.names=FALSE)
 }
-library(dplyr) 
+
 #create the bio_rep column based on the incidence within Group for easier organization later
 meta$bio_rep <- ave(seq_along(meta$Group), meta$Group, FUN = seq_along)
 
@@ -213,8 +226,8 @@ logcpm_INPUT_sig <- logcpm[rownames(logcpm) %in% sig.genes.pval$INPUT, grep("INP
 
 
 #save the logCPM objects to use for further analysis
-save(logcpm_PFC_sig, file = "logcpm_PFC_sig.Rdata")
-save(logcpm_NAC_sig, file = "logcpm_NAC_sig.Rdata")
-save(logcpm_INPUT_sig, file = "logcpm_INPUT_sig.Rdata")
+save(logcpm_PFC_sig, file = "logCPM_PFC_sig.Rdata")
+save(logcpm_NAC_sig, file = "logCPM_NAC_sig.Rdata")
+save(logcpm_INPUT_sig, file = "logCPM_INPUT_sig.Rdata")
 
 

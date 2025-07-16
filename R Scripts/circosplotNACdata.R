@@ -3,7 +3,6 @@
 # 2025-06-13
 
 # PATH DIRECTORY, LOAD FILES ----------------------------------------------
-
 workdir = ""
 workdirNAC = ""
 setwd(workdir)

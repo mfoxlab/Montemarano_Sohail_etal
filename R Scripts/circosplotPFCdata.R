@@ -3,9 +3,8 @@
 # 2025-06-13
 
 # PATH DIRECTORY, LOAD FILES ----------------------------------------------
-
-workdir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New PFC/Circos"
-workdirPFC = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New PFC"
+workdir = ""
+workdirPFC = ""
 setwd(workdir)
 
 #load the workspace

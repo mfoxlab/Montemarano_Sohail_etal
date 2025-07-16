@@ -1,10 +1,9 @@
-# Creating data tables for circos plots
+# Gene Ontology Analysis
 # Hajra Sohail
 # 2025-06-26
 
 # PATH DIRECTORY, LOAD FILES ----------------------------------------------
-
-workdir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New PFC"
+workdir = ""
 setwd(workdir)
 load(file = paste0(workdir,"/go_PFC_workspace.Rdata"))
 
@@ -12,10 +11,25 @@ load(file = paste0(workdir,"/go_PFC_workspace.Rdata"))
 # Load libraries, data setup
 library(gprofiler2)
 library(dplyr)
+library(ggplot2)
+
 
 PFC_gene_summary <- read.table(paste0(workdir, "/PFC_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
 PFC_sig_modules <- c(52, 39, 42, 5, 23, 65, 11, 16, 25, 6, 63, 43, 4, 67, 66, 33, 68, 85)
 
+# Import the colors.txt to get color keys for the graphs
+colordir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New WGCNA"
+color_data <- read.delim(file.path(colordir, "modulecolors.txt"), header = TRUE, stringsAsFactors = FALSE, quote = '', fill = TRUE)
+
+color_key <- color_data %>%
+  rename_at('Module', ~'module') 
+
+color_key$module <- gsub("ME","", as.character(color_key$module))
+
+color_key <- color_key %>%
+  mutate(module = as.numeric(module))
+
+# 1. RUNNING BP, CC, MF GENE ONTOLOGY WITH GOST ----------------------------------------------
 
 '''
 Single module
@@ -66,10 +80,6 @@ gost_result_clean <- gost_result$result %>%
 
 
 
-
-
-# 1. RUNNING BP, CC, MF GENE ONTOLOGY WITH GOST ----------------------------------------------
-
 PFC_each_go_result <- list()
 
 for (module in PFC_sig_modules) {
@@ -107,21 +117,20 @@ for (module in PFC_sig_modules) {
   
 }
 
-
 PFC_go_all_modules_cleaned <- PFC_go_all_modules %>%
   select(-query) %>%
-  select(module, everything()) %>%
+  select(module, everything(), -significant, significant) %>%
   mutate(across(where(is.list), ~ sapply(., paste, collapse = "|")))
 
+PFC_go_all_modules_cleaned_colorkey <- inner_join(PFC_go_all_modules_cleaned, color_key, by = "module") %>%
+  select(module, Hex.Color, Color.Name, everything())
 
-
-
-# VISUALIZING RESULTS
+# GRAPH 1: VISUALIZING OVERALL RESULTS ----------------------------------------------
+'''
 PFC_go_overview <- PFC_go_all_modules_cleaned %>%
   group_by(module) %>%
   count(source)
 
-library(ggplot2)
 ggplot(PFC_go_overview, aes(x = factor(module), y = n, fill = source)) +
   geom_bar(stat = "identity", 
            position = position_dodge(preserve = "single"), 
@@ -131,35 +140,182 @@ ggplot(PFC_go_overview, aes(x = factor(module), y = n, fill = source)) +
        y = "Count of Enriched Terms",
        fill = "GO Category") +
   theme_minimal(base_size = 14)
+'''
 
+# GRAPH 2: ENRICHMENT DOT PLOT, NUMBERED MODULE LABELS ----------------------------------------------
+# Select top 3 terms per module
 
-# GRAPH 2.
-# Optional: select top 5 terms per module
-top_terms <- PFC_go_all_modules_cleaned %>%
+top_terms <- PFC_go_all_modules_cleaned_colorkey %>%
   group_by(module) %>%
-  slice_min(order_by = p_value, n = 5) %>%
+  filter(intersection_size >= 5) %>%
+  filter(source == "GO:BP") %>%
+  slice_min(order_by = p_value, n = 3) %>%
   ungroup()
 
 theme_minimal(base_size = 12)
+top_terms$intersection_size_capped <- pmin(top_terms$intersection_size, 100)
 
-top_terms <- PFC_go_all_modules %>%
-  group_by(module) %>%
-  slice_min(order_by = p_value, n = 5) %>%
-  ungroup()
+'''
+# Numbered modules version
 
 ggplot(top_terms, aes(x = as.factor(module), 
-                      y = reorder(term_name, p_value))) +
-  geom_point(aes(size = intersection_size, color = -log10(p_value))) +
+                      y = reorder(term_name, -module))) +
+  geom_point(aes(size = intersection_size_capped, color = -log10(p_value))) +
   scale_color_viridis_c() +
-  labs(title = "GO Enrichment Dot Plot: PFC",
+  scale_size_continuous(
+    range = c(2, 8),  # adjust dot size appearance; tweak as needed
+    breaks = c(5, 20, 50, 100),
+    labels = c("5", "20", "50", "100+")
+  ) +
+  labs(title = "GO:BP Enrichment Dot Plot: PFC",
        x = "Module",
        y = "GO Term",
        size = "# Genes in Term",
        color = "-log10(p-value)") +
-  theme_minimal(base_size = 12)
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+'''
+# GRAPH 3: ENRICHMENT DOT PLOT, COLORED MODULE LABELS ----------------------------------------------
+# Ensure x-axis factor levels are consistent
+top_terms$Color.Name <- factor(top_terms$Color.Name, levels = unique(top_terms$Color.Name))
+
+# Create a module label dataset (1 row per module)
+module_labels <- top_terms %>%
+  distinct(Color.Name, Hex.Color) %>%
+  mutate(y = -1)  # Position below the lowest term
+
+# Plot
+PFC_go_plot_colorkey <- ggplot(top_terms, aes(x = Color.Name, y = reorder(term_name, -module))) +
+  
+  # Colored rectangles under x-axis
+  geom_tile(data = module_labels,
+            aes(x = Color.Name, y = y, fill = Hex.Color),
+            width = 0.9, height = 0.5,
+            inherit.aes = FALSE) +
+  
+  # Dot plot
+  geom_point(aes(size = intersection_size_capped, color = -log10(p_value))) +
+  
+  # Scales
+  scale_color_viridis_c() +
+  scale_fill_identity() +
+  scale_size_continuous(
+    range = c(2, 8),
+    breaks = c(5, 20, 50, 100),
+    labels = c("5", "20", "50", "100+")
+  ) +
+  
+  # Axes & labels
+  labs(title = "GO:BP Enrichment Dot Plot: PFC",
+       x = "Module",
+       y = "GO Term",
+       size = "# Genes in Term",
+       color = "-log10(p-value)") +
+  
+  # Theme
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.margin = margin(b = 30, t = 30, r = 10, l = 10)  
+  ) +
+  
+  # Expand y-axis to make room for bottom color tiles
+  scale_y_discrete(expand = expansion(add = 1.5))
+
+PFC_go_plot_colorkey
+
+# Saving and exporting
+pdf("PFC GO BP Enrichment Dot Plot Colored.pdf", width = 11, height = 8.5)
+print(PFC_go_plot_colorkey)
+dev.off()
+
+write.table(PFC_go_all_modules_cleaned_colorkey, file = "PFC_go_masterlist_concat.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
 
 
-write.table(PFC_go_all_modules_cleaned, file = "PFC_go_masterlist_concat.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
+# GRAPH 4: ENRICHMENT DOT PLOT, MANUALLY SELECTED GO TERMS WITH COLORED LABELS ----------------------------------------------
+# Import the file from the same directory as the color key
+
+manual_go_terms <- read.delim(file.path(colordir, "manual_go_terms.txt"), header = TRUE, stringsAsFactors = FALSE, quote = '', fill = TRUE)
+manual_go_terms <- manual_go_terms %>%
+  rename_at('GO_ID', ~'term_id')
+
+# inner_join by term_id
+PFC_go_manual_terms <- inner_join(PFC_go_all_modules_cleaned_colorkey, manual_go_terms, by = "term_id")
+
+# Visualize
+top_terms_manual <- PFC_go_manual_terms %>%
+  group_by(module) %>%
+  #filter(intersection_size >= 5) %>%
+  #filter(source.y == "GO:BP") %>%
+  #slice_min(order_by = p_value, n = 3) %>%           # No filtering for this graph!
+  ungroup()
+
+
+
+theme_minimal(base_size = 12)
+top_terms_manual$intersection_size_capped <- pmin(top_terms_manual$intersection_size, 75)
+
+# Ensure x-axis factor levels are consistent
+top_terms_manual$Color.Name <- factor(top_terms_manual$Color.Name, levels = unique(top_terms_manual$Color.Name))
+
+# Create a module label dataset (1 row per module)
+module_labels_manual <- top_terms_manual %>%
+  distinct(Color.Name, Hex.Color) %>%
+  mutate(y = -1)  # Position below the lowest term
+
+# Plot
+PFC_go_plot_colorkey_manual <- ggplot(top_terms_manual, aes(x = Color.Name, y = reorder(term_name.y, -module))) +
+  
+  # Colored rectangles under x-axis
+  geom_tile(data = module_labels_manual,
+            aes(x = Color.Name, y = y, fill = Hex.Color),
+            width = 0.9, height = 0.5,
+            inherit.aes = FALSE) +
+  
+  # Dot plot
+  geom_point(aes(size = intersection_size_capped, color = -log10(p_value))) +
+  
+  # Scales
+  scale_color_viridis_c() +
+  scale_fill_identity() +
+  scale_size_continuous(
+    range = c(2, 8),
+    breaks = c(3, 25, 50, 75),
+    labels = c("3", "25", "50", "75+")
+  ) +
+  
+  # Axes & labels
+  labs(title = "GO Enrichment Dot Plot: PFC (Manually Selected Terms)",
+       x = "Module",
+       y = "GO Term",
+       size = "# Genes in Term",
+       color = "-log10(p-value)") +
+  
+  # Theme
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.margin = margin(b = 30, t = 30, r = 10, l = 10)  
+  ) +
+  
+  # Expand y-axis to make room for bottom color tiles
+  scale_y_discrete(expand = expansion(add = 1.5))
+
+PFC_go_plot_colorkey_manual
+
+# Saving and exporting
+pdf("PFC GO Enrichment Dot Plot Colored Manually Selected Terms.pdf", width = 11, height = 8.5)
+print(PFC_go_plot_colorkey_manual)
+dev.off()
+
 
 # 2. RUNNING KEGG WITH GOST ----------------------------------------------
 
@@ -229,6 +385,7 @@ PFC_kegg_all_modules_cleaned <- PFC_kegg_all_modules %>%
 # VISUALIZING RESULTS
 PFC_kegg_overview <- PFC_kegg_all_modules_cleaned %>%
   count(term_name)
+
 
 
 

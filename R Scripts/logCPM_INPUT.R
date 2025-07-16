@@ -10,6 +10,8 @@ setwd(workdirINPUT)
 
 load(file = paste0(workdirINPUT, "/logCPM_INPUT_workspace.RData"))
 
+#load(paste0(workdir, "/logCPM_INPUT_sig_Annalisa.Rdata"))
+
 library(WGCNA)
 library(limma)
 library(dplyr)
@@ -78,7 +80,10 @@ for(module in module_list) {
   roast_result <- roast(expr_data, index = gene_index, design = design)
   results[[as.character(module)]] <- roast_result
 }
-
+#add sex metadata for later circos comparisons
+sexes<-ifelse(grepl("_M", sample_names),1,0)
+sex_data<-data.frame(Sample=sample_names, Sex=sexes)
+rownames(sex_data)<-sample_names
 
 
 #identify MEs and make adjacency heatmaps
@@ -205,13 +210,24 @@ hub_genes <- apply(kME, 2, function(x) names(x)[which.max(x)])
 names(hub_genes) <- paste0("ME", sub("kME", "", names(hub_genes)))
 
 
-#create design matrix
+#sex related 
+sex_combined_df <- cbind(MEsINPUT$eigengenes, Sex = sex_data$Sex)
+sex_combined_df$Sex <- factor(sex_combined_df$Sex, levels = c(0, 1), labels = c('FEMALE', 'MALE'))
+sex_condition_combined <- interaction(sex_combined_df$Sex, combined_df$Condition, drop = TRUE)
+sex_condition_combined <- factor(sex_condition_combined, levels = c("FEMALE.SAL", "FEMALE.FENT", "MALE.SAL", "MALE.FENT"))
+sex_drug_combined_df <- cbind(MEsINPUT$eigengenes, SexCondition = sex_condition_combined)
+sex_combined_df$SexCondition <- interaction(sex_combined_df$Sex, combined_df$Condition, drop = TRUE)
+sex_combined_df$SexCondition <- factor(sex_combined_df$SexCondition, 
+                                       levels = c("FEMALE.SAL", "FEMALE.FENT", "MALE.SAL", "MALE.FENT"))
+# Step 4: Subset for female and male data separately
+female_data <- sex_combined_df[sex_combined_df$Sex == "FEMALE", ]
+male_data <- sex_combined_df[sex_combined_df$Sex == "MALE", ]
 
 design <- model.matrix(~ Condition, data = combined_df)
 eigengenes_df <- t(MEsINPUT$eigengenes)
 
 fit <- lmFit(eigengenes_df, design)
-fit <- eBayes(fit)
+fit <- eBayes(fit,trend=TRUE)
 
 # Get the results table
 results <- topTable(fit, coef="ConditionFENT", number=nrow(eigengenes_df)) 
@@ -222,4 +238,50 @@ results$ensembl_gene_id <- sapply(rownames(results), function(x) hub_genes[x])
 results_annotated <- merge(results, annotations, by.x = "ensembl_gene_id", by.y = "ensembl_gene_id", all.x = TRUE)
 
 
-write.table(results_annotated, "INPUTmoduleEigengenesDE.txt", sep = "\t", row.names = FALSE, quote = FALSE)
+female_data$SexCondition <- factor(female_data$SexCondition, 
+                                   levels = c("FEMALE.SAL", "FEMALE.FENT"))
+male_data$SexCondition <- factor(male_data$SexCondition, 
+                                 levels = c("MALE.SAL", "MALE.FENT"))
+
+# For females, relevel the factor so FEMALE.SAL is the reference
+female_data$SexCondition <- relevel(female_data$SexCondition, ref = "FEMALE.SAL")
+
+female_design<-model.matrix(~0 +SexCondition, data = female_data)
+female_eigengenes <- t(female_data[, 1:ncol(MEsINPUT$eigengenes)])
+female_lm_fit <- lmFit(female_eigengenes, female_design)
+
+male_design <- model.matrix(~0 +SexCondition, data = male_data)
+male_eigengenes <- t(MEsINPUT$eigengenes[rownames(male_data), ])
+male_lm_fit <- lmFit(male_eigengenes, male_design)
+
+
+# Define contrasts (FENT vs SAL) for females
+female_contrasts <- makeContrasts(
+  FEM_FENT_vs_SAL = SexConditionFEMALE.FENT - SexConditionFEMALE.SAL, 
+  levels = female_design
+)
+male_contrasts <- makeContrasts(
+  MALE_FENT_vs_SAL = SexConditionMALE.FENT - SexConditionMALE.SAL, 
+  levels = male_design
+)
+
+female_fit <- contrasts.fit(female_lm_fit, female_contrasts)
+female_fit <- eBayes(female_fit,trend=TRUE)
+male_fit <- contrasts.fit(male_lm_fit, male_contrasts)
+male_fit <- eBayes(male_fit,trend=TRUE)
+
+female_results<-topTable(female_fit, coef="FEM_FENT_vs_SAL",number=nrow(female_eigengenes))
+male_results<-topTable(male_fit, coef="MALE_FENT_vs_SAL", number=nrow(male_eigengenes))
+female_results$ModuleEigengene<-rownames(female_results)
+female_results$ensembl_gene_id<-sapply(rownames(female_results), function(x) hub_genes[x])
+
+male_results$ModuleEigengene<-rownames(male_results)
+male_results$ensembl_gene_id<-sapply(rownames(male_results),function(x) hub_genes[x])
+
+write.table(results_annotated, "INPUT_sexcomb_moduleEigengenesDE.txt", sep = "\t", row.names = FALSE, quote = FALSE) #module eigengene data for sexes combined
+write.table(female_results, "INPUT_F_moduleEigengenesDE.txt",sep="\t", row.names=FALSE, quote=FALSE) #module eigengene data for females
+write.table(male_results,"INPUT_M_moduleEigengenesDE.txt", sep="\t", row.names=FALSE, quote=FALSE) #module eigengene data for males
+
+#now with sexes separated 
+
+save.image(file = "logCPM_INPUT_workspace.RData")

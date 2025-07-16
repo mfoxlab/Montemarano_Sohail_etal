@@ -4,8 +4,8 @@
 
 # PATH DIRECTORY, LOAD FILES ----------------------------------------------
 
-workdir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New NAC/Circos"
-workdirNAC = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New NAC"
+workdir = ""
+workdirNAC = ""
 setwd(workdir)
 
 #load the workspace

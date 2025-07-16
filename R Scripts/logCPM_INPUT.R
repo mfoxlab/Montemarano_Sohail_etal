@@ -10,7 +10,6 @@ setwd(workdirINPUT)
 
 load(file = paste0(workdirINPUT, "/logCPM_INPUT_workspace.RData"))
 
-#load(paste0(workdir, "/logCPM_INPUT_sig_Annalisa.Rdata"))
 
 library(WGCNA)
 library(limma)

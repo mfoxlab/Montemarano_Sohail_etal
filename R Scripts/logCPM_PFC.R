@@ -10,6 +10,7 @@ setwd(workdirPFC)
 
 load(file = paste0(workdirPFC, "/logCPM_PFC_workspace.RData"))
 
+load(paste0(workdir, "/logCPM_PFC_sig.Rdata"))
 
 library(WGCNA)
 library(limma)

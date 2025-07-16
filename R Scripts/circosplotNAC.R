@@ -4,10 +4,9 @@
 
 
 # SETUP ------------------------------------------------------------------------------------------
-
 # Set working directory
-workdir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New NAC/Circos"
-colordir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New WGCNA"
+workdir = ""
+colordir = ""
 setwd(workdir)
 load(file = paste0(workdir,"/circosplotNACworkspace.Rdata"))
 

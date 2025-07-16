@@ -10,6 +10,8 @@ setwd(workdirNAC)
 
 load(file = paste0(workdirNAC, "/logCPM_NAC_workspace.RData"))
 
+load(paste0(workdir, "/logCPM_NAC_sig.Rdata"))
+
 
 library(WGCNA)
 library(limma)

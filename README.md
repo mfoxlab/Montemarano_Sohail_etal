@@ -5,8 +5,8 @@ A short description of your project goes here.
 ## Table of Contents
 
 -   [R and Package Versions](#1-versions)
--   [Raw Files](#2-raw)
--   [R Scripts](#3-scripts)
+-   [Raw Files](#2-raw-files)
+-   [R Scripts](#3-r-scripts)
 
 ## 1. Versions 
 

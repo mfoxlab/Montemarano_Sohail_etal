@@ -4,13 +4,11 @@ A short description of your project goes here.
 
 ## Table of Contents
 
--   [R and Package Versions](#versions)
--   [Raw Files](#raw)
--   [R Scripts](#scripts)
--   [Data and Figure](#contributing)
--   [License](#license)
+-   [R and Package Versions](#1-versions)
+-   [Raw Files](#2-raw)
+-   [R Scripts](#3-scripts)
 
-## 1. Versions {#versions}
+## 1. Versions 
 
 This project was run using R 4.4.1. This version is recommended for full reproducibility and compatibility with packages.
 
@@ -33,7 +31,7 @@ This reads the [`renv.lock`](https://github.com/mfoxlab/Montemarano_Sohail_etal/
 
 *Note: Due to the complexity of installing BiocManager packages, `Go.db` (v 3.19.1) was not added to the `renv.lock` file. Please manually install this package.*
 
-## 2. Raw Files {#raw}
+## 2. Raw Files
 
 Next, please download the following two files and place them into your working directory:
 
@@ -45,7 +43,7 @@ Next, please download the following two files and place them into your working d
 
 -   Contains metadata for variables involved in the RNASeq analysis: sex, drug, VTA target, etc.
 
-## 3. R Scripts {#scripts}
+## 3. R Scripts
 
 Download and run the following files in your working directory:
 

@@ -4,6 +4,7 @@
 
 
 # SETUP ------------------------------------------------------------------------------------------
+# TWO DIRECTORIES WERE USED FOR ORGANIZATIONAL PURPOSES
 workdir = ""
 workdirINPUT = ""
 setwd(workdirINPUT)

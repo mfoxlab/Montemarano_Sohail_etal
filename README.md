@@ -8,28 +8,11 @@ A short description of your project goes here.
 -   [Raw Files](#2-raw-files)
 -   [R Scripts](#3-r-scripts)
 
-## 1. Versions 
+## 1. R and Package Versions
 
 This project was run using R 4.4.1. This version is recommended for full reproducibility and compatibility with packages.
 
-All scripts will have the `library()` commands, but not the `install::packages()` ones. To install all proper packages necessary for this project, please follow the instructions below.
-
-How to use:
-
-1.  Download the [`renv.lock`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/renv.lock) file and place into your working directory.
-2.  In R or RStudio, set your working directory to your project folder.
-3.  In your console, run:
-
-```         
-install.packages("renv") # just once, if not already installed
-renv::restore()
-```
-
-This reads the [`renv.lock`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/renv.lock) file and downloads/installs all the required packages that have been used (and the exact versions used) into a local renv library. This does not conflict with your global R packages.
-
-4.  Further R scripts may be run in this environment.
-
-*Note: Due to the complexity of installing BiocManager packages, `Go.db` (v 3.19.1) was not added to the `renv.lock` file. Please manually install this package.*
+All scripts will have the `library()` commands, but not the `install::packages()` ones. To install all proper packages necessary for this project, please download and run [`WGCNA_installpackages.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_installpackages.R). Exact package versions are noted, however, running this script as is will also reproduce the data.
 
 ## 2. Raw Files
 
@@ -42,6 +25,14 @@ Next, please download the following two files and place them into your working d
 [`meta.Rdata`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/Raw%20Files/meta.Rdata)
 
 -   Contains metadata for variables involved in the RNASeq analysis: sex, drug, VTA target, etc.
+
+[`modulecolors.txt`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/Raw%20Files/modulecolors.txt)
+
+-   Color key for gene modules and creating plots (Steps 4 and 5).
+
+[`manual_go_terms.txt`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/Raw%20Files/manual_go_terms.txt)
+
+-   For use in gene ontology analysis (Step 5).
 
 ## 3. R Scripts
 
@@ -68,8 +59,6 @@ Download and run the following files in your working directory:
 
 4.  `circosplotPFC.R`, `circosplotNAC.R`, and `circosplotINPUT.R`
 
--   *Note: Please download and place `colors.txt` into your working directory before running.*
-
 -   Generates four PDF plots:
 
     1.  circos plot with significant modules (unlabeled)
@@ -81,5 +70,8 @@ Download and run the following files in your working directory:
 
 5.  `go_PFC.R`, `go_NAC.R`, `go_INPUT.R`
 
+-   *Note: Rerunning these GOst queries may be subject to change over time. For exact results, download the GO_workspace file respective to each VTA projection and load it into your session.*
+
 -   Performs gene ontology and KEGG analyses via gprofiler2. Outputs 2 .txt files.
+
 -   Visualizes the top enriched GO terms in dot plots.

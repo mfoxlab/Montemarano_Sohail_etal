@@ -1,1 +1,0 @@
-"ensembl_gene_id"	"mgi_symbol"	"gene_biotype"	"description"

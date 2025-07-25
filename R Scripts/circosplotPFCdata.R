@@ -44,7 +44,7 @@ all_modules <- full_join(all_modules, male_data, by = "ModuleEigengene")
 
 #now, rearrange 
 all_modules <- all_modules %>%
-  select(c(1, 2, 4, 6, 3, 5, 7))
+  dplyr::select(c(1, 2, 4, 6, 3, 5, 7))
 
 
 write.table(all_modules, file = "PFC_circosdata_all_MEs.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
@@ -69,7 +69,7 @@ significant_modules <- inner_join(significant_modules, male_data, by = "ModuleEi
 
 #now, rearrange 
 significant_modules <- significant_modules %>%
-  select(c(1, 2, 4, 6, 3, 5, 7))
+  dplyr::select(c(1, 2, 4, 6, 3, 5, 7))
 
 
 write.table(significant_modules, file = "PFC_circosdata.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)

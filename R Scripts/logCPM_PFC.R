@@ -4,6 +4,7 @@
 
 
 # SETUP ------------------------------------------------------------------------------------------
+# TWO DIRECTORIES WERE USED FOR ORGANIZATIONAL PURPOSES
 workdir = ""
 workdirPFC = ""
 setwd(workdirPFC)
@@ -11,6 +12,7 @@ setwd(workdirPFC)
 load(file = paste0(workdirPFC, "/logCPM_PFC_workspace.RData"))
 
 load(paste0(workdir, "/logCPM_PFC_sig.Rdata"))
+
 
 library(WGCNA)
 library(limma)
@@ -162,6 +164,7 @@ write.table(outp, "PFC_gene_summary.txt", sep = "\t", row.names = FALSE, quote =
 
 #find hub genes 
 ensembl <- useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+
 topHubGenesList <- list()
 moduleNames <- colnames(ModuleMembership)
 

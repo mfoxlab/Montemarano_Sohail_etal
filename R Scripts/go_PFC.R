@@ -18,7 +18,7 @@ PFC_gene_summary <- read.table(paste0(workdir, "/PFC_gene_summary.txt"), sep = '
 PFC_sig_modules <- c(52, 39, 42, 5, 23, 65, 11, 16, 25, 6, 63, 43, 4, 67, 66, 33, 68, 85)
 
 # Import the colors.txt to get color keys for the graphs
-colordir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New WGCNA"
+colordir = ""
 color_data <- read.delim(file.path(colordir, "modulecolors.txt"), header = TRUE, stringsAsFactors = FALSE, quote = '', fill = TRUE)
 
 color_key <- color_data %>%

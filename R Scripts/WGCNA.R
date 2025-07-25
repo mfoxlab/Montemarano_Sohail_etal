@@ -10,12 +10,7 @@
 workdir = ""
 setwd(workdir)
 
-# 2: Install R packages properly compatible with this project
-
-install.packages("renv")
-renv::restore() # TEST THIS!
-
-# 3: Install libraries for this R file
+# 2: Install libraries for this R file
 
 library(limma)
 library(edgeR)
@@ -187,14 +182,14 @@ sig.genes.fdr=list()
 for(i in target) { sig.genes.fdr[[i]] = rownames(limma.fdr)[rowSums(limma.fdr[,grep(i,colnames(limma.fdr))] <=0.1)>0]}
 cbind(genepval=lapply(sig.genes.pval,length),genefdr=lapply(sig.genes.fdr,length))
 
-'''
-results here
-      genepval genefdr
-PFC   18801    9658   
-AMY   0        0      
-INPUT 18888    11169  
-NAC   18666    10352  
-'''
+#
+# results here
+#       genepval genefdr
+# PFC   18801    9658   
+# AMY   0        0      
+# INPUT 18888    11169  
+# NAC   18666    10352  
+#
 
 #write  genes p<0.05
 sigGenes.tab = lapply(1:length(target), function(i) { data.frame(ensembl_gene_id = sig.genes.pval[[target[i]]], limma.pvals[sig.genes.pval[[target[i]]], grep(target[i], colnames(limma.pvals))], limma.logFC[sig.genes.pval[[target[i]]], grep(target[i], colnames(limma.pvals))]) }) 

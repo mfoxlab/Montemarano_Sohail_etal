@@ -4,6 +4,7 @@
 
 
 # SETUP ------------------------------------------------------------------------------------------
+# TWO DIRECTORIES WERE USED FOR ORGANIZATIONAL PURPOSES
 workdir = ""
 workdirNAC = ""
 setwd(workdirNAC)
@@ -163,6 +164,7 @@ write.table(outp, "NAC_gene_summary.txt", sep = "\t", row.names = FALSE, quote =
 
 #find hub genes 
 ensembl <- useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+
 topHubGenesList <- list()
 moduleNames <- colnames(ModuleMembership)
 

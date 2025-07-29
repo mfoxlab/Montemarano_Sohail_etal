@@ -48,16 +48,16 @@ Download and run the following files in your working directory:
 -   Produces three `DEgenesummary` files for VTA-PFC, VTA-NAC, and VTA-INPUT genes.
 -   *Note: Gene information for VTA to amygdala neurons (DEgene_summary_AMY) can be ignored. Although this RNASeq data contains VTA-AMY neuron information, this project does not consider AMY as a variable to create WGCNA networks.*
 
-2.  `logCPM_PFC.R`, `logCPM_NAC.R`, and `logCPM_INPUT.R`
+2.  [`logCPM_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/logCPM_PFC.R), [`logCPM_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/logCPM_NAC.R), and [`logCPM_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/logCPM_INPUT.R)
 
 -   Builds WGCNA networks with only differentially expressed genes as a function of drug, projection target and sex..
 -   Makes `netREGION_8.Rdata` to create gene networks, modules, hub genes, and `REGION_gene_summary.txt` files for each projection. Three moduleEigengengesDE .txt files will be further used to create circos data and visualizations.
 
-3.  `circosplotPFCdata.R`, `circosplotNAC.Rdata`, and `circosplotINPUTdata.R`
+3.  [`circosplotPFCdata.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotPFCdata.R), [`circosplotNAC.Rdata`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotNACdata.R), and [`circosplotINPUTdata.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotINPUTdata.R)
 
 -   Organizes data to be used in circos plots. Merges log fold-change and P-Value data from sex-combined data with female and male data.
 
-4.  `circosplotPFC.R`, `circosplotNAC.R`, and `circosplotINPUT.R`
+4.  [`circosplotPFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotPFC.R), [`circosplotNAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotNAC.R), and [`circosplotINPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotINPUT.R)
 
 -   Generates four PDF plots:
 
@@ -68,10 +68,13 @@ Download and run the following files in your working directory:
 
 -   Run this entire script at once (as objects in this environment are overwritten to create each new plot).
 
-5.  `go_PFC.R`, `go_NAC.R`, `go_INPUT.R`
+5.  [`go_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_PFC.R), [`go_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_NAC.R), [`go_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_INPUT.R)
 
 -   *Note: Rerunning these GOst queries may be subject to change over time. For exact results, download the GO_workspace file respective to each VTA projection and load it into your session.*
 
 -   Performs gene ontology and KEGG analyses via gprofiler2. Outputs 2 .txt files.
 
 -   Visualizes the top enriched GO terms in dot plots.
+
+6. [`RRHO.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/RRHO.R)
+- Uses rank-rank hypergeometric overlap between two ranked gene lists (fentanyl vs saline DEGs) to plot heatmaps. 

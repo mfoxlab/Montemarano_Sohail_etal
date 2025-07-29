@@ -77,4 +77,4 @@ Download and run the following files in your working directory:
 -   Visualizes the top enriched GO terms in dot plots.
 
 6. [`RRHO.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/RRHO.R)
-- Uses rank-rank hypergeometric overlap between two ranked gene lists (fentanyl vs saline DEGs) to plot heatmaps. 
+- Uses rank-rank hypergeometric overlap between two ranked gene lists to plot heatmaps. All combinations of projection, sex, and drug are compared. 

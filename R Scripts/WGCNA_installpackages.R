@@ -36,6 +36,6 @@ install.packages("RRHO2")               # used v1.0
 
 install.packages("devtools")
 library(devtools)
-install_github("RRHO2/RRHO2", build_opts = c("--no-resave-data", "--no-manual"))  #used v1.0
+install_github("RRHO2/RRHO2", build_opts = c("--no-resave-data", "--no-manual"))  # used v1.0
 
 

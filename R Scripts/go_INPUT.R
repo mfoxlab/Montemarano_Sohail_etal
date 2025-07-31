@@ -1,24 +1,25 @@
 # Gene Ontology Analysis
 # Hajra Sohail
-# 2025-06-26
+# 2025-07-30
 
 # PATH DIRECTORY, LOAD FILES ----------------------------------------------
 workdir = ""
 setwd(workdir)
-load(file = paste0(workdir,"/go_INPUT_workspace.Rdata"))
-
+load(file = paste0(workdir,"/go_INPUT_workspace.Rdata")) 
 
 # Load libraries, data setup
 library(gprofiler2)
 library(dplyr)
 library(ggplot2)
+library(biomaRt)
+library(tidyr)
+library(purrr)
 
-
-INPUT_gene_summary <- read.table(paste0(workdir, "/INPUT_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
+INPUT_gene_summary <- read.table(paste0(workdir,"/INPUT_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
 INPUT_sig_modules <- c(24, 22, 16)
 
 # Import the colors.txt to get color keys for the graphs
-colordir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New WGCNA"
+colordir = ""
 color_data <- read.delim(file.path(colordir, "modulecolors.txt"), header = TRUE, stringsAsFactors = FALSE, quote = '', fill = TRUE)
 
 color_key <- color_data %>%
@@ -29,64 +30,68 @@ color_key$module <- gsub("ME","", as.character(color_key$module))
 color_key <- color_key %>%
   mutate(module = as.numeric(module))
 
+
 # 1. RUNNING BP, CC, MF GENE ONTOLOGY WITH GOST ----------------------------------------------
 
-'''
-Single module
+# Function to later convert Ensembl to mgi_symbols
+mouse_mart <- useMart("ensembl", dataset = "mmusculus_gene_ensembl")
 
-
-
-
-
-test_module <- INPUT_gene_summary %>%
-  filter(module.INPUT == "16") %>%
-  dplyr::select(mgi_symbol) %>%
-  distinct() %>%
-  pull()
-  
-# Convert to a format g:Profiler recognizes
-converted <- gconvert(
-  query = test_module,
-  organism = "mmusculus",
-  target = "ENSG",  # or try "ENSMUSG" if it accepts it
-  mthreshold = Inf
+ensembl_to_mgi <- getBM(
+  attributes = c("ensembl_gene_id", "mgi_symbol"),
+  mart = mouse_mart
 )
 
-head(converted)
-recognized_ids <- unique(converted$target)
+convert_ensembl_to_mgi <- function(ensembl_str, mapping_df) {
+  ensembl_ids <- unlist(strsplit(ensembl_str, "\\|"))
+  mapped_symbols <- mapping_df %>%
+    filter(ensembl_gene_id %in% ensembl_ids) %>%
+    pull(mgi_symbol)
+  # Return MGI symbols separated by |
+  paste(unique(na.omit(mapped_symbols)), collapse = "|")
+}
 
+'''
+
+# Single module
+  
+single_module <- INPUT_gene_summary %>%
+  filter(module.INPUT == "16") %>%
+  dplyr::select(ensembl_gene_id) %>%
+  distinct() %>%
+  pull()
 
 # Run GO
 gost_result  <- gost(
-  query = recognized_ids,
-  organism = "mmusculus",   # mouse genome
+  query = single_module,  
+  organism = "mmusculus",     # mouse genome
   sources = c("GO:BP", "GO:MF", "GO:CC"),
-  correction_method = "fdr", # similar to BH correction
-  significant = TRUE,       # only return significant results
+  correction_method = "fdr",  # similar to BH correction
+  significant = TRUE,         # only return significant results
   evcodes = TRUE,
-  user_threshold = 0.05     # adjust if needed
+  user_threshold = 0.05       # adjust if needed
 )
-
-
 
 gost_result_clean <- gost_result$result
 
-
-
 gost_result_clean <- gost_result$result %>%
-  mutate(Genes = sapply(intersection, paste, collapse = "|"))
+  mutate(intersection = gsub(",", "|", intersection),
+         evidence_codes = gsub(",", "|", evidence_codes))
+
+gost_result_clean <- gost_result_clean %>%
+  rowwise() %>%
+  mutate(intersection = convert_ensembl_to_mgi(intersection, ensembl_to_mgi)) %>%
+  ungroup()
 
 '''
-
-
-
+# All significant modules at once
+'''
 INPUT_each_go_result <- list()
 
 for (module in INPUT_sig_modules) {
   
   current_module <- INPUT_gene_summary %>%
     filter(module.INPUT == module) %>%
-    dplyr::select(mgi_symbol) %>% 
+    dplyr::select(ensembl_gene_id) %>%  
     distinct() %>%
     pull()
   
@@ -94,11 +99,11 @@ for (module in INPUT_sig_modules) {
   gost_result  <- gost(
     query = current_module,
     organism = "mmusculus",   
-    sources = c("GO:BP", "GO:MF", "GO:CC"),
+    sources = c("GO:BP", "GO:CC", "GO:MF"),
     correction_method = "fdr", 
     significant = TRUE, 
     evcodes = TRUE,
-    user_threshold = 0.05     
+    user_threshold = 0.05,     
   )
   
   # Adding data to the table gost_result_df
@@ -112,18 +117,35 @@ for (module in INPUT_sig_modules) {
     )
     
   }
-  # Compile all the results together 
-  INPUT_go_all_modules <- bind_rows(INPUT_each_go_result)
   
 }
 
+
+# Compile all the results together 
+INPUT_go_all_modules <- bind_rows(INPUT_each_go_result)
+
 INPUT_go_all_modules_cleaned <- INPUT_go_all_modules %>%
-  select(-query) %>%
-  select(module, everything(), -significant, significant) %>%
-  mutate(across(where(is.list), ~ sapply(., paste, collapse = "|")))
+  dplyr::select(-query) %>%
+  dplyr::select(module, everything(), -significant, significant) %>%
+  mutate(intersection = gsub(",", "|", intersection),
+         evidence_codes = gsub(",", "|", evidence_codes))
+
+INPUT_go_all_modules_cleaned <- INPUT_go_all_modules_cleaned %>%
+  rowwise() %>%
+  mutate(intersection = convert_ensembl_to_mgi(intersection, ensembl_to_mgi)) %>%
+  ungroup()
 
 INPUT_go_all_modules_cleaned_colorkey <- inner_join(INPUT_go_all_modules_cleaned, color_key, by = "module") %>%
-  select(module, Hex.Color, Color.Name, everything())
+  dplyr::select(module, Hex.Color, Color.Name, everything()) %>%
+  mutate(across(where(is.list), ~sapply(., function(x) paste(unlist(x), collapse = "|"))))
+'''
+# The below line is to PRESERVE GO RESULTS from 7/30/2025.
+# save(INPUT_go_all_modules_cleaned_colorkey, file = "INPUT_go_all_modules_cleaned_colorkey_7_30_2025.Rdata")
+
+# The below line is going to open the GO result created 7/30/2025 and can be used in the rest of the script.
+# Used gprofiler version "e113_eg59_p19_f6a03c19"
+load("INPUT_go_all_modules_cleaned_colorkey_7_30_2025.Rdata")
+write.table(INPUT_go_all_modules_cleaned_colorkey, file = "INPUT_go_masterlist_concat.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
 
 # GRAPH 1: VISUALIZING OVERALL RESULTS ----------------------------------------------
 '''
@@ -143,8 +165,8 @@ ggplot(INPUT_go_overview, aes(x = factor(module), y = n, fill = source)) +
 '''
 
 # GRAPH 2: ENRICHMENT DOT PLOT, NUMBERED MODULE LABELS ----------------------------------------------
-# Select top 3 terms per module
 
+# Select top 3 terms per module
 top_terms <- INPUT_go_all_modules_cleaned_colorkey %>%
   group_by(module) %>%
   filter(intersection_size >= 5) %>%
@@ -180,6 +202,7 @@ ggplot(top_terms, aes(x = as.factor(module),
 
 '''
 # GRAPH 3: ENRICHMENT DOT PLOT, COLORED MODULE LABELS ----------------------------------------------
+
 # Ensure x-axis factor levels are consistent
 top_terms$Color.Name <- factor(top_terms$Color.Name, levels = unique(top_terms$Color.Name))
 
@@ -234,12 +257,11 @@ INPUT_go_plot_colorkey
 pdf("INPUT GO BP Enrichment Dot Plot Colored.pdf", width = 11, height = 8.5)
 print(INPUT_go_plot_colorkey)
 dev.off()
-write.table(INPUT_go_all_modules_cleaned_colorkey, file = "INPUT_go_masterlist_concat.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
 
 
 # GRAPH 4: ENRICHMENT DOT PLOT, MANUALLY SELECTED GO TERMS WITH COLORED LABELS ----------------------------------------------
-# Import the file from the same directory as the color key
 
+# Import the file from the same directory as the color key
 manual_go_terms <- read.delim(file.path(colordir, "manual_go_terms.txt"), header = TRUE, stringsAsFactors = FALSE, quote = '', fill = TRUE)
 manual_go_terms <- manual_go_terms %>%
   rename_at('GO_ID', ~'term_id')
@@ -254,9 +276,6 @@ top_terms_manual <- INPUT_go_manual_terms %>%
   #filter(source.y == "GO:BP") %>%
   #slice_min(order_by = p_value, n = 3) %>%           # No filtering for this graph!
   ungroup()
-
-checking <- INPUT_go_all_modules_cleaned_colorkey %>%
-  unique(`term_name`) 
 
 
 theme_minimal(base_size = 12)
@@ -320,8 +339,6 @@ dev.off()
 
 # 2. RUNNING KEGG WITH GOST ----------------------------------------------
 
-INPUT_each_kegg_result <- list()
-
 '''
 # Single module 
 
@@ -343,12 +360,15 @@ testresults <- results$result
 
 '''
 
+# All significant modules at once
+
+INPUT_each_kegg_result <- list()
 
 for (module in INPUT_sig_modules) {
   
   current_module <- INPUT_gene_summary %>%
     filter(module.INPUT == module) %>%
-    dplyr::select(mgi_symbol) %>% 
+    dplyr::select(ensembl_gene_id) %>% 
     distinct() %>%
     pull()
   
@@ -378,16 +398,18 @@ for (module in INPUT_sig_modules) {
 
 
 INPUT_kegg_all_modules_cleaned <- INPUT_kegg_all_modules %>%
-  select(-query) %>%
-  select(module, everything()) %>%
-  mutate(across(where(is.list), ~ sapply(., paste, collapse = "|")))
+  dplyr::select(-query, -evidence_codes, -parents) %>%
+  dplyr::select(module, everything()) %>%
+  mutate(intersection = gsub(",", "|", intersection))
 
+INPUT_kegg_all_modules_cleaned <- INPUT_kegg_all_modules_cleaned %>%
+  rowwise() %>%
+  mutate(intersection = convert_ensembl_to_mgi(intersection, ensembl_to_mgi)) %>%
+  ungroup()
 
 # VISUALIZING RESULTS
 INPUT_kegg_overview <- INPUT_kegg_all_modules_cleaned %>%
   count(term_name)
-
-
 
 
 write.table(INPUT_kegg_all_modules_cleaned, file = "INPUT_kegg_masterlist_concat.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)

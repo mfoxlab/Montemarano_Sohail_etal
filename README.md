@@ -70,11 +70,12 @@ Download and run the following files in your working directory:
 
 5.  [`go_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_PFC.R), [`go_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_NAC.R), [`go_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_INPUT.R)
 
--   *Note: Rerunning these GOst queries may be subject to change over time. For exact results, download the GO_workspace file respective to each VTA projection and load it into your session.*
+-   *Note: Rerunning these GOst queries may be subject to change over time. For exact results, download the `REGION_go_all_modules_cleaned_colorkey_7_30_2025.Rdata` file respective to each VTA projection. The script will have a line of code where it will load it into your workspace.*
 
 -   Performs gene ontology and KEGG analyses via gprofiler2. Outputs 2 .txt files.
 
 -   Visualizes the top enriched GO terms in dot plots.
 
-6. [`RRHO.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/RRHO.R)
-- Uses rank-rank hypergeometric overlap between two ranked gene lists to plot heatmaps. All combinations of projection, sex, and drug are compared. 
+6.  [`RRHO.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/RRHO.R)
+
+-   Uses rank-rank hypergeometric overlap between two ranked gene lists to plot heatmaps. All combinations of projection, sex, and drug are compared.

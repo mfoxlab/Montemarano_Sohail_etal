@@ -30,7 +30,6 @@ install.packages("readxl")              # used v1.4.3
 BiocManager::install("ComplexHeatmap")  # used v2.20.0
 
 install.packages("gprofiler2")          # used v0.2.3
-# GO VERSION "e112_eg59_p19_25aa4782"
 
 install.packages("RRHO2")               # used v1.0
 

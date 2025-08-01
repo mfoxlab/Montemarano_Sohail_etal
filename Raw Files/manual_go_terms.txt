@@ -1,0 +1,21 @@
+GO_ID	source	term_name
+GO:0015629	GO:CC	actin cytoskeleton
+GO:0007268	GO:BP	chemical synaptic transmission
+GO:0014046	GO:BP	dopamine secretion
+GO:0099528	GO:MF	G protein-coupled neurotransmitter receptor activity
+GO:0098982	GO:CC	GABA-ergic synapse
+GO:0098978	GO:CC	glutamatergic synapse
+GO:0006874	GO:BP	intracellular calcium ion homeostasis
+GO:0008504	GO:MF	monoamine transmembrane transporter activity
+GO:0015844	GO:BP	monoamine transport
+GO:0022008	GO:BP	neurogenesis
+GO:0043005	GO:CC	neuron projection
+GO:0030594	GO:MF	neurotransmitter receptor activity
+GO:1903233	GO:BP	regulation of Ca+2-dependent exocytosis of neurotransmitter
+GO:0006836	GO:BP	neurotransmitter transport
+GO:0001504	GO:BP	neurotransmitter uptake
+GO:0050807	GO:BP	regulation of synapse organization
+GO:0048167	GO:BP	regulation of synaptic plasticity
+GO:0045202	GO:CC	synapse
+GO:0099536	GO:BP	synaptic signaling
+GO:0008021	GO:CC	synaptic vesicle

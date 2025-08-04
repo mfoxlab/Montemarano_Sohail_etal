@@ -4,13 +4,15 @@
 
 
 # SETUP ------------------------------------------------------------------------------------------
-workdir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New WGCNA"
-workdirPFC = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New PFC"
+# TWO DIRECTORIES WERE USED FOR ORGANIZATIONAL PURPOSES
+workdir = ""
+workdirPFC = ""
 setwd(workdirPFC)
 
 load(file = paste0(workdirPFC, "/WGCNA_PFC_workspace.RData"))
 
-#load(paste0(workdir, "/logCPM_PFC_sig_Annalisa.Rdata"))
+load(paste0(workdir, "/logCPM_PFC_sig.Rdata"))
+
 
 library(WGCNA)
 library(limma)
@@ -24,12 +26,12 @@ allowWGCNAThreads()
 # FINDING THE CORRECT SOFT THRESHOLD ------------------------------------------------------------------------------------------
 # MAC USERS: Please run the two lines below. Skip the rest of the code in this section. Move onto 'CREATE MODULES AND GENE SUMMARIES'.
 #load(paste0(workdirPFC, "/netPFC_8.Rdata"))
-#logcpm_PFC_sig <-t (logcpm_PFC_sig) 
+#logcpm_PFC_sig <-t (logcpm_PFC_sig)
 
 #define the power range 
 powers <- c(1:30, seq(from = 35, to = 50, by = 5)) 
 
-#transpose the data so that genes and samples are correctly arranged
+#transpose the data so that genes and samples are correctly arrangedd
 logcpm_PFC_sig<- t(logcpm_PFC_sig)
 
 #perform the soft-thresholding analysis for VTA->PFC
@@ -165,6 +167,7 @@ write.table(outp, "PFC_gene_summary.txt", sep = "\t", row.names = FALSE, quote =
 
 #find hub genes 
 ensembl <- useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+
 topHubGenesList <- list()
 moduleNames <- colnames(ModuleMembership)
 
@@ -289,4 +292,3 @@ write.table(male_results,"PFC_M_moduleEigengenesDE.txt", sep="\t", row.names=FAL
 
 
 save.image(file = "WGCNA_PFC_workspace.RData")
-

@@ -24,6 +24,9 @@ library(pheatmap)
 allowWGCNAThreads()
 
 # FINDING THE CORRECT SOFT THRESHOLD ------------------------------------------------------------------------------------------
+# MAC USERS: Please run the two lines below. Skip the rest of the code in this section. Move onto 'CREATE MODULES AND GENE SUMMARIES'.
+#load(paste0(workdirINPUT, "/netINPUT_8.Rdata"))
+#logcpm_INPUT_sig <-t (logcpm_INPUT_sig)
 
 #define the power range 
 powers <- c(1:30, seq(from = 35, to = 50, by = 5)) 

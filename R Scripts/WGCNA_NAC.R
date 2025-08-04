@@ -4,13 +4,15 @@
 
 
 # SETUP ------------------------------------------------------------------------------------------
-workdir = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New WGCNA"
-workdirNAC = "/Users/hsohail/OneDrive - Penn State Health/Documents/WGCNA/Annalisa/New NAC"
+# TWO DIRECTORIES WERE USED FOR ORGANIZATIONAL PURPOSES
+workdir = ""
+workdirNAC = ""
 setwd(workdirNAC)
 
 load(file = paste0(workdirNAC, "/WGCNA_NAC_workspace.RData"))
 
-#load(paste0(workdir, "/logCPM_NAC_sig_Annalisa.Rdata"))
+load(paste0(workdir, "/logCPM_NAC_sig.Rdata"))
+
 
 library(WGCNA)
 library(limma)
@@ -29,7 +31,7 @@ allowWGCNAThreads()
 #define the power range 
 powers <- c(1:30, seq(from = 35, to = 50, by = 5)) 
 
-#transpose the data so that genes and samples are correctly arranged
+#transpose the data so that genes and samples are correctly arrangedd
 logcpm_NAC_sig<- t(logcpm_NAC_sig)
 
 #perform the soft-thresholding analysis for VTA->NAC
@@ -165,6 +167,7 @@ write.table(outp, "NAC_gene_summary.txt", sep = "\t", row.names = FALSE, quote =
 
 #find hub genes 
 ensembl <- useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+
 topHubGenesList <- list()
 moduleNames <- colnames(ModuleMembership)
 

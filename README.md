@@ -16,15 +16,15 @@ All scripts will have the `library()` commands, but not the `install::packages()
 
 ## 2. Raw Files
 
-Next, please download the following two files and place them into your working directory:
+Next, please download the following files and place them into your working directory:
 
 [`counts.Rdata`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/Raw%20Files/counts.Rdata)
 
--   Contains raw counts of 56,980 genes (after filtering in Galaxy?) for numerous group conditions.
+-   Contains raw counts of 56,980 genes (after filtering in Galaxy?) for numerous group conditions (Used for Step 1)
 
 [`meta.Rdata`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/Raw%20Files/meta.Rdata)
 
--   Contains metadata for variables involved in the RNASeq analysis: sex, drug, VTA target, etc.
+-   Contains metadata for variables involved in the RNASeq analysis: sex, drug, VTA target, etc. (Step 1)
 
 [`modulecolors.txt`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/Raw%20Files/modulecolors.txt)
 

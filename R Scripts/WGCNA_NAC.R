@@ -9,7 +9,7 @@ workdir = ""
 workdirNAC = ""
 setwd(workdirNAC)
 
-load(file = paste0(workdirNAC, "/logCPM_NAC_workspace.RData"))
+load(file = paste0(workdirNAC, "/WGCNA_NAC_workspace.RData"))
 
 load(paste0(workdir, "/logCPM_NAC_sig.Rdata"))
 
@@ -288,4 +288,4 @@ write.table(male_results,"NAC_M_moduleEigengenesDE.txt", sep="\t", row.names=FAL
 
 #now with sexes separated 
 
-save.image(file = "logCPM_NAC_workspace.RData")
+save.image(file = "WGCNA_NAC_workspace.RData")

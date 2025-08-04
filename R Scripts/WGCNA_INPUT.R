@@ -9,7 +9,7 @@ workdir = ""
 workdirINPUT = ""
 setwd(workdirINPUT)
 
-load(file = paste0(workdirINPUT, "/logCPM_INPUT_workspace.RData"))
+load(file = paste0(workdirINPUT, "/WGCNA_INPUT_workspace.RData"))
 
 load(paste0(workdir, "/logCPM_INPUT_sig.Rdata"))
 
@@ -286,4 +286,4 @@ write.table(male_results,"INPUT_M_moduleEigengenesDE.txt", sep="\t", row.names=F
 
 #now with sexes separated 
 
-save.image(file = "logCPM_INPUT_workspace.RData")
+save.image(file = "WGCNA_INPUT_workspace.RData")

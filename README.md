@@ -50,7 +50,9 @@ Download and run the following files in your working directory:
 
 2.  [`WGCNA_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_PFC.R), [`WGCNA_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_NAC.R), and [`WGCNA_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_INPUT.R)
 
--   Builds WGCNA networks with only differentially expressed genes as a function of drug, projection target and sex..
+-   *Note: Mac users are recommended to download the* `netREGION_8.Rdata` *file respective to each VTA projection. The script will have two commented out lines of code that need to be run. Run those two lines and skip the rest of that section.*
+
+-   Builds WGCNA networks with only differentially expressed genes as a function of drug, projection target and sex.
 -   Makes `netREGION_8.Rdata` to create gene networks, modules, hub genes, and `REGION_gene_summary.txt` files for each projection. Three moduleEigengengesDE .txt files will be further used to create circos data and visualizations.
 
 3.  [`circosplotPFCdata.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotPFCdata.R), [`circosplotNAC.Rdata`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotNACdata.R), and [`circosplotINPUTdata.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotINPUTdata.R)

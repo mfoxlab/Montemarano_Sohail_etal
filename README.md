@@ -40,7 +40,7 @@ Download and run the following files in your working directory:
 
 *Note: Where there is a line named* `workdir = ""` *or something similar, please write your file path to set your own working directory. Skip the* `load(file = paste0(workdir,"/FILENAME_workspace.Rdata"))` *line in your first run.*
 
-1.  [`DElimma.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/installpackages.R)
+1.  [`DElimma.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/DElimma.R)
 
 -   Perform quality control to remove lowly-expressed reads
 -   Sets up differential expression based on comparisons between sex, drug (fentanyl vs. saline), and VTA projection target (PFC, NAC, or INPUT (total VTA)).

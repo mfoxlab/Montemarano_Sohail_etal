@@ -9,7 +9,7 @@ workdir = ""
 workdirPFC = ""
 setwd(workdirPFC)
 
-load(file = paste0(workdirPFC, "/logCPM_PFC_workspace.RData"))
+load(file = paste0(workdirPFC, "/WGCNA_PFC_workspace.RData"))
 
 load(paste0(workdir, "/logCPM_PFC_sig.Rdata"))
 
@@ -288,5 +288,5 @@ write.table(male_results,"PFC_M_moduleEigengenesDE.txt", sep="\t", row.names=FAL
 #now with sexes separated 
 
 
-save.image(file = "logCPM_PFC_workspace.RData")
+save.image(file = "WGCNA_PFC_workspace.RData")
 

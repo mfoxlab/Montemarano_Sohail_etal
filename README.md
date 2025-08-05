@@ -74,7 +74,7 @@ Download and run the following files in your working directory:
 
 -   *Note: Rerunning these GOst queries may be subject to change over time. For exact results, download the* `REGION_go_all_modules_cleaned_colorkey_7_30_2025.Rdata` *file respective to each VTA projection. The script will have a line of code where it will load it into your workspace.*
 
--   Performs gene ontology and KEGG analyses via gprofiler2. Outputs 2 .txt files.
+-   Performs gene ontology and KEGG analyses via gprofiler2. 
 
 -   Visualizes the top enriched GO terms in dot plots.
 

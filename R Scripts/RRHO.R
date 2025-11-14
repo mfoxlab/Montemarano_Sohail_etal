@@ -41,28 +41,19 @@ for (df_name in names(DEoutp)) {
   }
 }
 
-AMYFMRRHO <- RRHO2_initialize(RRHO_AMY_F_FENT,RRHO_AMY_M_FENT, labels=c("FEM AMY","MALE AMY"), log10.ind=TRUE)
+
 NACFMRRHO <- RRHO2_initialize(RRHO_NAC_F_FENT,RRHO_NAC_M_FENT, labels=c("FEM NAC","MALE NAC"), log10.ind=TRUE)
 PFCFMRRHO <- RRHO2_initialize(RRHO_PFC_F_FENT,RRHO_PFC_M_FENT, labels=c("FEM PFC","MALE PFC"), log10.ind=TRUE)
 INPUTFMRRHO <- RRHO2_initialize(RRHO_INPUT_F_FENT,RRHO_INPUT_M_FENT, labels=c("FEM INPUT","MALE INPUT"), log10.ind=TRUE)
-
-AMYNACFENTRRHO <- RRHO2_initialize(RRHO_AMY_FENT,RRHO_NAC_FENT, labels=c("AMY FENT","NAC FENT"), log10.ind=TRUE)
-AMYPFCFENTRRHO <- RRHO2_initialize(RRHO_AMY_FENT,RRHO_PFC_FENT, labels=c("AMY FENT","PFC FENT"), log10.ind=TRUE)
-AMYINPUTFENTRRHO <- RRHO2_initialize(RRHO_AMY_FENT,RRHO_INPUT_FENT, labels=c("AMY FENT","INPUT FENT"), log10.ind=TRUE)
-
 NACPFCFENTRRHO <- RRHO2_initialize(RRHO_NAC_FENT,RRHO_PFC_FENT, labels=c("NAC FENT","PFC FENT"), log10.ind=TRUE)
 NACINPUTFENTRRHO <- RRHO2_initialize(RRHO_NAC_FENT,RRHO_INPUT_FENT, labels=c("NAC FENT","INPUT FENT"), log10.ind=TRUE)
-
 PFCINPUTFENTRRHO <- RRHO2_initialize(RRHO_PFC_FENT,RRHO_INPUT_FENT, labels=c("PFC FENT","INPUT FENT"), log10.ind=TRUE)
 
 
 # EXTRA RRHOs
 NACPFCMRRHO <- RRHO2_initialize(RRHO_NAC_M_FENT,RRHO_PFC_M_FENT, labels=c("MALE NAC","MALE PFC"), log10.ind=TRUE)
-NACAMYMRRHO <- RRHO2_initialize(RRHO_NAC_M_FENT,RRHO_AMY_M_FENT, labels=c("MALE NAC","MALE AMY"), log10.ind=TRUE)
 NACINPUTMRRHO <- RRHO2_initialize(RRHO_NAC_M_FENT,RRHO_INPUT_M_FENT, labels=c("MALE NAC","MALE INPUT"), log10.ind=TRUE)
 NACINPUTFRRHO <- RRHO2_initialize(RRHO_NAC_F_FENT,RRHO_INPUT_F_FENT, labels=c("FEM NAC","FEM INPUT"), log10.ind=TRUE)
-
-NACAMYFRRHO <- RRHO2_initialize(RRHO_NAC_F_FENT,RRHO_AMY_F_FENT, labels=c("FEM NAC","FEM AMY"), log10.ind=TRUE)
 NACPFCFRRHO <- RRHO2_initialize(RRHO_NAC_F_FENT,RRHO_PFC_F_FENT, labels=c("FEM NAC","FEM PFC"), log10.ind=TRUE)
 
 
@@ -99,9 +90,6 @@ for (obj_name in rrho_objects) {
 
 
 # WRITING PDFs
-pdf("AMYFM_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(AMYFMRRHO)
-dev.off() 
 
 pdf("NACFM_RRHO.pdf", width = 9.5, height = 7)
 RRHO2_heatmap(NACFMRRHO)
@@ -114,20 +102,6 @@ dev.off()
 pdf("INPUTFM_RRHO.pdf", width = 9.5, height = 7)
 RRHO2_heatmap(INPUTFMRRHO)
 dev.off()
-
-
-pdf("AMYNACFENT_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(AMYNACFENTRRHO)
-dev.off()
-
-pdf("AMYPFCFENT_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(AMYPFCFENTRRHO)
-dev.off()
-
-pdf("AMYINPUTFENT_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(AMYINPUTFENTRRHO)
-dev.off()
-
 
 pdf("NACPFCFENT_RRHO.pdf", width = 9.5, height = 7)
 RRHO2_heatmap(NACPFCFENTRRHO)
@@ -148,10 +122,6 @@ pdf("NACPFCM_RRHO.pdf", width = 9.5, height = 7)
 RRHO2_heatmap(NACPFCMRRHO)
 dev.off()
 
-pdf("NACAMYM_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(NACAMYMRRHO)
-dev.off()
-
 pdf("NACINPUTM_RRHO.pdf", width = 9.5, height = 7)
 RRHO2_heatmap(NACINPUTMRRHO)
 dev.off()
@@ -161,9 +131,6 @@ RRHO2_heatmap(NACINPUTFRRHO)
 dev.off()
 
 
-pdf("NACAMYF_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(NACAMYFRRHO)
-dev.off()
 
 pdf("NACPFCF_RRHO.pdf", width = 9.5, height = 7)
 RRHO2_heatmap(NACPFCFRRHO)
@@ -172,9 +139,6 @@ dev.off()
 
 #EXTRA VENN DIAGRAMS
 # First four regions FM 
-RRHO2_vennDiagram(AMYFMRRHO, type="ud")
-RRHO2_vennDiagram(AMYFMRRHO, type="dd")
-RRHO2_vennDiagram(AMYFMRRHO, type="uu")
 
 RRHO2_vennDiagram(NACFMRRHO, type="ud")
 RRHO2_vennDiagram(NACFMRRHO, type="dd")
@@ -190,19 +154,6 @@ RRHO2_vennDiagram(INPUTFMRRHO, type="uu")
 
 
 # COMBINATIONS
-#AMY
-RRHO2_vennDiagram(AMYNACFENTRRHO, type="ud")
-RRHO2_vennDiagram(AMYNACFENTRRHO, type="dd")
-RRHO2_vennDiagram(AMYNACFENTRRHO, type="uu")
-
-RRHO2_vennDiagram(AMYPFCFENTRRHO, type="ud")
-RRHO2_vennDiagram(AMYPFCFENTRRHO, type="dd")
-RRHO2_vennDiagram(AMYPFCFENTRRHO, type="uu")
-
-RRHO2_vennDiagram(AMYINPUTFENTRRHO, type="ud")
-RRHO2_vennDiagram(AMYINPUTFENTRRHO, type="dd")
-RRHO2_vennDiagram(AMYINPUTFENTRRHO, type="uu")
-
 
 #NAC
 RRHO2_vennDiagram(NACPFCFENTRRHO, type="ud")
@@ -224,9 +175,7 @@ RRHO2_vennDiagram(NACPFCMRRHO, type="ud")
 RRHO2_vennDiagram(NACPFCMRRHO, type="dd")
 RRHO2_vennDiagram(NACPFCMRRHO, type="uu")
 
-RRHO2_vennDiagram(NACAMYMRRHO, type="ud")
-RRHO2_vennDiagram(NACAMYMRRHO, type="dd")
-RRHO2_vennDiagram(NACAMYMRRHO, type="uu")
+
 
 RRHO2_vennDiagram(NACINPUTMRRHO, type="ud")
 RRHO2_vennDiagram(NACINPUTMRRHO, type="dd")

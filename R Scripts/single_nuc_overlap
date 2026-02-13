@@ -1,0 +1,329 @@
+library(dplyr)
+library(Seurat)
+library(readr)
+library(DeconvoBuddies)
+library(tidyr)
+library(purrr)
+library(tibble)
+library(SummarizedExperiment)
+
+# Load data
+load("~/FOX LAB DATA/Single nuclei Seq After Fent IVSA folders/day/Markers_neuronintegratedMajClus.rda")
+load("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/DEoutputp05.Rdata")
+load("~/FOX LAB DATA/Single nuclei Seq After Fent IVSA folders/day/NeuronIntegrated.rda")
+
+#  refining top neuron markers as defined from findmarkers() in Seurat from Fox et al Addiction Biology
+
+ranked_markers <- lapply(markers, function(df) {
+  df <- tibble::rownames_to_column(df,var="gene")
+  
+  # Ensure numeric columns are numeric
+  numeric_cols <- c("avg_log2FC", "p_val", "p_val_adj", "pct.1", "pct.2")
+  for (col in numeric_cols) {
+    if (col %in% colnames(df)) {
+      df[[col]] <- as.numeric(df[[col]])
+    }
+  }
+  
+  # Keep only positive log2FC and sort
+  df %>%
+    filter(avg_log2FC > 0) %>%
+    arrange(p_val_adj, desc(avg_log2FC)) 
+})
+
+# Combine into long format and ensure tibble
+ranked_markers_long <- bind_rows(
+  lapply(names(ranked_markers), function(cluster) {
+    ranked_markers[[cluster]] %>%
+      mutate(marker_cluster = cluster)
+  })
+) %>% tibble::as_tibble()
+
+# Keep only unique genes, tie break by highest logFC
+ranked_markers_unique <- ranked_markers_long %>%
+  group_by(gene) %>%
+  arrange(desc(avg_log2FC), p_val_adj) %>%
+  slice_head(n = 1) %>%   
+  ungroup()
+
+# Top 50 markers per cluster
+top_50_markers <- ranked_markers_unique %>%
+  group_by(marker_cluster) %>%
+  arrange(p_val_adj, desc(avg_log2FC)) %>%
+  slice_head(n = 50) %>%
+  ungroup()
+
+# Split into list by cluster
+top_50_markers_list <- split(top_50_markers, top_50_markers$marker_cluster)
+
+# single nuc data for use in deconvobuddies meanratio and 1vsAll marker finding
+sce <- as.SingleCellExperiment(neuron.integrated, assay = "RNA")
+colData(sce)$cellType <- factor(colData(sce)$Majclus)
+
+mean_ratios <- get_mean_ratio(
+  sce,
+  cellType_col = "cellType",
+  assay_name   = "logcounts"
+)
+
+
+top_50_mr_markers <- mean_ratios %>%
+  filter(MeanRatio > 1) %>%   # keep only genes enriched in the cluster
+  group_by(cellType.target) %>%
+  slice_max(MeanRatio, n = 50) # top 50 markers per cluster
+
+
+
+# Split top markers into a list by cluster
+top_50_mr_markers_list <- split(
+  top_50_mr_markers,
+  top_50_mr_markers$cellType.target
+)
+top_50_mr_markers_list<-lapply(top_50_mr_markers_list,as_tibble)
+
+#using 1vsAll method
+markers1vsAll<- findMarkers_1vAll(
+  sce,
+  assay_name = "logcounts",
+  cellType_col = "cellType",
+  add_symbol = FALSE,
+  mod = NULL,
+  direction = "up"
+)
+top_50_1vsAll_markers <- markers1vsAll %>%
+  group_by(cellType.target) %>%
+  slice_max(order_by = std.logFC, n = 50)  # top 50 markers per cluster
+top_50_1vsAll_markers_list<- split(
+  top_50_1vsAll_markers,
+  top_50_1vsAll_markers$cellType.target
+)
+top_50_1vsvAll_markers_list<-lapply(top_50_1vsAll_markers_list,as_tibble)
+
+
+
+#-------------------------------
+# key columns for filtering
+#-------------------------------
+pval_col_sal <- c(PFC = "P.Value_PFC_SAL_INPUT", NAC = "P.Value_NAC_SAL_INPUT")
+logFC_col_sal <- c(PFC = "logFC_PFC_SAL_INPUT", NAC = "logFC_NAC_SAL_INPUT")
+pval_col_fent<-c(PFC="P.Value_PFC_FENT", NAC = "P.Value_NAC_FENT")
+logFC_col_fent<-c(PFC= "logFC_PFC_FENT", NAC= "logFC_NAC_FENT")
+
+
+#-------------------------------
+# Fisher enrichment per cluster function
+#-------------------------------
+run_fisher <- function(DE_table, region, pval_cols, logFC_cols, top_markers_list, direction = "up") {
+  
+  # Return NULL if no DE data or region not defined
+  if (nrow(DE_table) == 0 || !region %in% names(pval_cols)) return(NULL)
+  
+  # Rename 'mgi_symbol' to 'gene' to match marker lists
+  if ("mgi_symbol" %in% colnames(DE_table)) {
+    DE_table <- DE_table %>% dplyr::rename(gene = mgi_symbol)
+  } else if (!"gene" %in% colnames(DE_table)) {
+    stop(paste0("DE table for region ", region, " has no 'gene' or 'mgi_symbol' column"))
+  }
+  
+  pcol <- pval_cols[[region]]
+  logFCcol <- logFC_cols[[region]]
+  if (!all(c(pcol, logFCcol) %in% colnames(DE_table))) return(NULL)
+  
+  # Select DEGs based on direction
+  deg_genes <- DE_table %>%
+    dplyr::filter(.data[[pcol]] < 0.05,
+                  if (direction == "up") .data[[logFCcol]] > 0 else .data[[logFCcol]] < 0) %>%
+    dplyr::pull(gene)
+  
+  universe_genes <- DE_table$gene
+  deg_genes <- intersect(deg_genes, universe_genes)
+  
+  cluster_results <- lapply(names(top_markers_list), function(cluster) {
+    cluster_genes <- intersect(top_markers_list[[cluster]]$gene, universe_genes)
+    overlap_genes <- intersect(cluster_genes, deg_genes)
+    
+    a <- length(overlap_genes)
+    b <- length(setdiff(cluster_genes, deg_genes))
+    c <- length(setdiff(deg_genes, cluster_genes))
+    d <- length(setdiff(universe_genes, union(cluster_genes, deg_genes)))
+    
+    fisher_test <- fisher.test(matrix(c(a, b, c, d), nrow = 2), alternative = "greater")
+    
+    tibble::tibble(
+      region = region,
+      cluster = cluster,
+      direction = direction,   # Track up or down
+      overlap = a,
+      cluster_size = length(cluster_genes),
+      deg_total = length(deg_genes),
+      universe_total = length(universe_genes),
+      odds_ratio = unname(fisher_test$estimate),
+      p_value = fisher_test$p.value,
+      overlap_genes = paste(overlap_genes, collapse = ", ")
+    )
+  })
+  
+  dplyr::bind_rows(cluster_results)
+}
+
+#-------------------------------
+# function to Run Fisher for a given marker list and condition
+#-------------------------------
+run_fisher_for_all <- function(top_markers_list, DE_list, pval_cols, logFC_cols, direction = "up") {
+  result <- lapply(names(DE_list), function(region) {
+    run_fisher(DE_list[[region]], region, pval_cols, logFC_cols, top_markers_list, direction)
+  }) %>%
+    dplyr::bind_rows() %>%
+    dplyr::mutate(FDR = p.adjust(p_value, method = "BH"))
+  
+  return(result)
+}
+
+
+#-------------------------------
+# loop: all marker lists × SAL/FENT × up/down
+#-------------------------------
+marker_lists <- list(
+  Seurat = top_50_markers_list,
+  MeanRatio = top_50_mr_markers_list,
+  OneVsAll = top_50_1vsAll_markers_list
+)
+
+treatments <- list(
+  SAL = list(pval = pval_col_sal, logFC = logFC_col_sal),
+  FENT = list(pval = pval_col_fent, logFC = logFC_col_fent)
+)
+
+directions <- c("up", "down")
+
+for (marker_name in names(marker_lists)) {
+  markers <- marker_lists[[marker_name]]
+  
+  for (treat_name in names(treatments)) {
+    pval_cols <- treatments[[treat_name]]$pval
+    logFC_cols <- treatments[[treat_name]]$logFC
+    
+    for (dir in directions) {
+      message("Running Fisher: ", marker_name, " | ", treat_name, " | ", dir)
+      fisher_result <- run_fisher_for_all(markers, DEoutp, pval_cols, logFC_cols, direction = dir)
+      
+      # Write to file
+      filename <- paste0("fisher_", marker_name, "_", treat_name, "_", dir, ".tsv")
+      readr::write_tsv(fisher_result, filename)
+    }
+  }
+}
+
+#cluster classifiers from addiction biol paper 
+cluster_class_map <- list(
+  dopamine = c("16"),
+  dopacombo = c("18"),
+  glut5 = c("5"),
+  glut11 = c("11"),
+  glut20 = c("20"),
+  glut26 = c("26"),
+  glut13 = c("13"),
+  gaba9 = c("9"),
+  gaba14 = c("14"),
+  gaba15 = c("15"),
+  gaba19 = c("19"),
+  gaba24 = c("24")
+)
+
+
+#-----------------------------
+#filter DEGS function 
+#----------------------------------
+
+filter_DEGs <- function(df, region, pval_cols, logFC_cols, direction = "up") {
+  if (nrow(df) == 0 || !region %in% names(pval_cols)) return(tibble())
+  
+  pcol <- pval_cols[[region]]
+  logFCcol <- logFC_cols[[region]]
+  
+  if (!all(c(pcol, logFCcol) %in% colnames(df))) return(tibble())
+  
+  if (direction == "up") {
+    df %>% filter(.data[[pcol]] < 0.05, .data[[logFCcol]] > 0)
+  } else if (direction == "down") {
+    df %>% filter(.data[[pcol]] < 0.05, .data[[logFCcol]] < 0)
+  } else {
+    stop("Direction must be 'up' or 'down'")
+  }
+}
+#--------------------------------------------------
+#proportion function
+#------------------------------------------------
+compute_proportions <- function(marker_lists, DEoutp, cluster_class_map,
+                                        treatments = list(
+                                          SAL = list(pval = pval_col_sal, logFC = logFC_col_sal),
+                                          FENT = list(pval = pval_col_fent, logFC = logFC_col_fent)
+                                        ),
+                                        directions = c("up", "down")) {
+  
+  all_results <- list()
+  
+  for (marker_name in names(marker_lists)) {
+    marker_list <- marker_lists[[marker_name]]
+    
+    for (treat_name in names(treatments)) {
+      pval_cols <- treatments[[treat_name]]$pval
+      logFC_cols <- treatments[[treat_name]]$logFC
+      
+      for (dir in directions) {
+        
+        message("Computing proportions: ", marker_name, " | ", treat_name, " | ", dir)
+        
+        for (region in names(DEoutp)) {
+          DE_df <- DEoutp[[region]]
+          
+          # Rename mgi_symbol to gene if needed
+          if ("mgi_symbol" %in% colnames(DE_df)) DE_df <- dplyr::rename(DE_df, gene = mgi_symbol)
+          
+          # Skip if no columns exist
+          if (!(region %in% names(pval_cols)) || !all(c(pval_cols[[region]], logFC_cols[[region]]) %in% colnames(DE_df))) next
+          
+          # Filter DEGs 
+          deg_vector <- filter_DEGs(DE_df, region, pval_cols, logFC_cols, direction = dir) %>% 
+            dplyr::pull(gene) %>% unique()
+          
+          deg_total <- length(deg_vector)
+          all_markers <- unique(unlist(marker_list))
+          deg_in_any_cluster <- deg_vector[deg_vector %in% all_markers]
+          total_in_cluster <- length(deg_in_any_cluster)
+          
+          # Loop over cluster classes
+          prop_df <- lapply(names(cluster_class_map), function(class_name) {
+            clusters <- cluster_class_map[[class_name]]
+            class_genes <- unique(unlist(marker_list[clusters]))
+            overlap <- sum(deg_vector %in% class_genes)
+            
+            data.frame(
+              class = class_name,
+              overlap = overlap,
+              prop_total_deg = overlap / deg_total,
+              prop_cluster_deg = ifelse(total_in_cluster > 0, overlap / total_in_cluster, NA),
+              region = region,
+              method = marker_name,
+              treatment = treat_name,
+              direction = dir
+            )
+          }) %>% dplyr::bind_rows()
+          
+          all_results[[paste(marker_name, treat_name, dir, region, sep = "_")]] <- prop_df
+        }
+      }
+    }
+  }
+  
+  dplyr::bind_rows(all_results)
+}
+
+
+
+
+
+
+all_proportions <- compute_proportions(marker_lists, DEoutp, cluster_class_map)
+
+readr::write_tsv(all_proportions, "proportionalcelltyperesults_new.tsv")

@@ -1,0 +1,203 @@
+library(circlize)
+library(dplyr)
+library(tidyr)
+library(ComplexHeatmap)
+library(grid)
+
+
+# data
+df <- read.table(text = "
+region	cluster	overlap	logFDR	prop_cluster
+PFC	DA-Combo-18	28	2.57855458	0.078431373
+PFC	DA-16	40	10.77415563	0.112044818
+PFC	GABA-14	40	8.852998143	0.112044818
+PFC	GABA-15	33	3.833342014	0.092436975
+PFC	GABA-19	20	3.089314626	0.056022409
+PFC	GABA-24	21	1.143487343	0.058823529
+PFC	GABA-9	31	3.752064248	0.086834734
+PFC	GLUT-11	29	3.833342014	0.081232493
+PFC	GLUT-13	25	1.175786398	0.070028011
+PFC	GLUT-20	36	6.747872316	0.100840336
+PFC	GLUT-26	15	0.170246604	0.042016807
+PFC	GLUT-5	39	8.09970449	0.109243697
+NAC	DA-Combo-18	26	1.720700181	0.08
+NAC	DA-16	29	3.38289166	0.089230769
+NAC	GABA-14	33	5.017402626	0.101538462
+NAC	GABA-15	30	2.57855458	0.092307692
+NAC	GABA-19	19	2.717016393	0.058461538
+NAC	GABA-24	21	1.215988472	0.064615385
+NAC	GABA-9	30	3.55296038	0.092307692
+NAC	GLUT-11	22	1.155446536	0.067692308
+NAC	GLUT-13	31	3.55296038	0.095384615
+NAC	GLUT-20	28	3.180335446	0.086153846
+NAC	GLUT-26	24	2.013006807	0.073846154
+NAC	GLUT-5	32	4.128031067	0.098461538
+",header=TRUE, stringsAsFactors = FALSE)
+
+#define cell type order and colors from the addiction biology paper
+desired_order <- c(
+  "DA-16",
+  "DA-Combo-18",
+  "GLUT-5",
+  "GLUT-11",
+  "GLUT-20",
+  "GLUT-26",
+  "GLUT-13",
+  "GABA-9",
+  "GABA-14",
+  "GABA-15",
+  "GABA-19",
+  "GABA-24"
+)
+cluster_colors <- c(
+  "GLUT-11"       = "#B79F00",
+  "GLUT-13" = "#7CAE00",
+  "GLUT-5"      = "#F8766D",  
+  "GABA-14"     = "#00BA38",
+  "DA-16"     = "#00BFC4",
+  "GABA-15"     = "#00C08B",
+  "GABA-19"     = "#619CFF",
+  "GABA-9"      = "#DE8C00",  
+  "GLUT-20"     = "#C77CFF",
+  "GABA-24"     = "#F564E3",
+  "GLUT-26"     = "#FF64B0",
+  "DA-Combo-18"     = "#00B4F0"
+)
+
+
+# Define clusters and regions
+clusters <- unique(df$cluster)
+regions <- c("PFC", "NAC")
+
+
+FDRval_colors <- colorRamp2(c(0, 1.2999, 1.3, 3.5), c("white", "white", "yellow", "springgreen"))
+overlap_colors <- colorRamp2(c(0,40), c("white", "deeppink3"))
+prop_colors <- colorRamp2(c(0, 0.11), c("white", "deepskyblue3"))
+
+pdf("circosplot_MRenrichment.pdf", width=9.5, height =7)
+circos.clear()
+circos.par(
+  start.degree= -180,
+  gap.degree =0.2,
+  track.margin=c(0.001,0.001),
+  cell.padding=c(0,0,0,0)
+  )
+df$cluster <- factor(df$cluster, levels = desired_order)
+
+circos.initialize(factors = df$cluster, xlim = c(0,1)
+)
+#------------------------
+#labeling track for cell type
+#----------------------------
+circos.track(
+  sectors = levels(df$cluster),
+  ylim = c(0, 1),
+  track.height = 0.08,
+  bg.col = cluster_colors[levels(df$cluster)],
+  bg.border = NA,
+  panel.fun = function(x, y) {
+    
+    sector_name <- CELL_META$sector.index
+    xcenter <- CELL_META$xcenter
+    ycenter <- CELL_META$ycenter
+    
+    circos.text(
+      xcenter,
+      ycenter,
+      labels = sector_name,
+      facing = "inside",
+      niceFacing = TRUE,
+      cex = 0.5,
+      col = "black"
+    )
+  }
+)
+# -------------------
+# Outermost track: prop_cluster (heatmap)
+# -------------------
+circos.track(factors=df$cluster, y=df$prop_cluster, track.height=0.1, panel.fun=function(x,y){
+  sector.index <- get.cell.meta.data("sector.index")
+  vals <- df %>% filter(cluster==sector.index)
+  y_bottom <- 0
+  for(i in seq_len(nrow(vals))){
+    circos.rect(0, y_bottom, 1, y_bottom+1, col=prop_colors(vals$prop_cluster[i]), border=NA)
+    circos.text(0.5, y_bottom+0.5, vals$region[i], cex=0.5, facing="inside", niceFacing=TRUE)
+    y_bottom <- y_bottom + 1
+  }
+}, ylim=c(0,2))
+# -------------------
+# Middle track: overlap
+# -------------------
+circos.track(factors=df$cluster, y=df$overlap, track.height=0.1, panel.fun=function(x,y){
+  sector.index <- get.cell.meta.data("sector.index")
+  vals <- df %>% filter(cluster == sector.index)
+  y_bottom <- 0
+  for(i in seq_len(nrow(vals))){
+    circos.rect(0, y_bottom, 1, y_bottom + 1,
+                col = overlap_colors(vals$overlap[i]), border=NA)
+       y_bottom <- y_bottom + 1
+  }
+}, ylim=c(0,2))
+
+
+# -------------------
+# Innermost track: logFDR
+# -------------------
+circos.track(factors=df$cluster, y=df$logFDR, track.height=0.1, panel.fun=function(x,y){
+  sector.index <- get.cell.meta.data("sector.index")
+  vals <- df %>% filter(cluster == sector.index)
+  y_bottom <- 0
+  for(i in seq_len(nrow(vals))){
+    circos.rect(0, y_bottom, 1, y_bottom + 1,
+                col = FDRval_colors(vals$logFDR[i]), border=NA)
+    
+    y_bottom <- y_bottom + 1
+  }
+}, ylim=c(0,2))
+
+
+
+# -------------------------------
+# Legends for each track
+# -------------------------------
+
+# 1. logFDR
+lgd_logFDR <- Legend(
+  title = "logFDR",
+  col_fun = FDRval_colors,
+  at = c(0, 1.3, 3.5),
+  labels = c(0,1.3,3.5),
+  direction = "horizontal",
+  title_position = "topcenter"
+)
+
+# 2. overlap
+lgd_overlap <- Legend(
+  title = "# overlapping genes",
+  col_fun = overlap_colors,
+  direction = "horizontal",
+  title_position = "topcenter"
+)
+
+# 3. prop_cluster
+lgd_prop <- Legend(
+  title = "Percent cluster mapping",
+  col_fun = prop_colors,
+  at=c(0,0.05,0.1),
+  labels=c(0,5,10),
+  
+  direction = "horizontal",
+  title_position = "topcenter"
+)
+
+# -------------------------------
+# Draw the legends
+# -------------------------------
+
+# Combine all legends into one block
+lgd_all <- packLegend(lgd_logFDR, lgd_overlap, lgd_prop, gap = unit(2, "mm"))
+
+# Draw them at the bottom of the plot
+draw(lgd_all, x = unit(0.15, "npc"), y = unit(0.05, "npc") + unit(0.05, "cm"), just = c("center","bottom"))
+dev.off()
+

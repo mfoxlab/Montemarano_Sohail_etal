@@ -201,11 +201,11 @@ for(i in target) { sig.genes.fdr[[i]] = rownames(limma.fdr)[rowSums(limma.fdr[,g
 cbind(genepval=lapply(sig.genes.pval,length),genefdr=lapply(sig.genes.fdr,length))
 
 #results here  
-#    genepval genefdr
-#PFC   39798    12665  
-#AMY   38794    12821  
-#INPUT 42780    15029  
-#NAC   39094    13329
+#  genepval genefdr
+#PFC   19228    9687   
+#AMY   18870    9780   
+#INPUT 19385    11488  
+#NAC   19039    10364  
 
 
 
@@ -236,11 +236,12 @@ colnames(logcpm) <- new_sample_names
 logcpm_PFC_sig <- logcpm[rownames(logcpm) %in% sig.genes.pval$PFC, grep("PFC", colnames(logcpm))]
 logcpm_NAC_sig <- logcpm[rownames(logcpm) %in% sig.genes.pval$NAC, grep("NAC", colnames(logcpm))]
 logcpm_INPUT_sig <- logcpm[rownames(logcpm) %in% sig.genes.pval$INPUT, grep("INPUT", colnames(logcpm))]
+logcpm_AMY_sig<-logcpm[rownames(logcpm) %in% sig.genes.pval$AMY, grep("AMY", colnames(logcpm))]
 
 
 #save the logCPM objects to use for further analysis
 save(logcpm_PFC_sig, file = "logCPM_PFC_sig.Rdata")
 save(logcpm_NAC_sig, file = "logCPM_NAC_sig.Rdata")
 save(logcpm_INPUT_sig, file = "logCPM_INPUT_sig.Rdata")
-
+save(logcpm_AMY_sig, file="logCPM_AMY_sig.Rdata")
 

@@ -40,7 +40,7 @@ Download and run the following files in your working directory:
 1.  [`DElimma.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/DElimma.R)
 
 -   Perform quality control to remove lowly-expressed reads
--   Sets up differential expression based on comparisons between sex, drug (fentanyl vs. saline), and VTA projection target (PFC, NAC, or INPUT (total VTA)).
+-   Sets up differential expression based on comparisons between sex, drug (fentanyl vs. saline), and VTA projection target (PFC, NAC, AMY, or INPUT (total VTA)).
 -   Produces a `DEoutputp05` file that contains genes with nominal p<0.05
 -   Produces  `DEgenesummary` files for VTA-PFC, VTA-NAC, VTA-AMY, and VTA-INPUT genes.
 
@@ -51,7 +51,7 @@ Download and run the following files in your working directory:
 -   Builds WGCNA networks with only differentially expressed genes as a function of drug, projection target and sex.
 -   Makes `netREGION_8.Rdata` to create gene networks, modules, hub genes, and `REGION_gene_summary.txt` files for each projection. Three moduleEigengengesDE .txt files will be further used to create circos data and visualizations.
 
-3.  [`circosplotPFCdata.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotPFCdata.R), [`circosplotNAC.Rdata`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotNACdata.R), and [`circosplotINPUTdata.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotINPUTdata.R)
+3.  [`circosplotPFCdata.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotPFCdata.R), [`circosplotNAC.Rdata`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotNACdata.R), [`circosplotAMYdata.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotAMYdata.R),and [`circosplotINPUTdata.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotINPUTdata.R)
 
 -   Organizes data to be used in circos plots. Merges log fold-change and P-Value data from sex-combined data with female and male data.
 
@@ -66,7 +66,7 @@ Download and run the following files in your working directory:
 
 -   Run this entire script at once (as objects in this environment are overwritten to create each new plot).
 
-5.  [`go_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_PFC.R), [`go_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_NAC.R), [`go_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_INPUT.R)
+5.  [`go_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_PFC.R), [`go_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_NAC.R), [`go_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_INPUT.R), [`go_AMY.R`]
 
 -   *Note: Rerunning these GOst queries may be subject to change over time. For exact results, download the* `###REPLACE THIS FILE NAME#####` *file respective to each VTA projection. The script will have a line of code where it will load it into your workspace.*
 

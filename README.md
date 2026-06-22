@@ -20,7 +20,7 @@ Next, please download the following files and place them into your working direc
 
 [`counts.Rdata`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/Raw%20Files/counts.Rdata)
 
--   Contains raw counts of 56,980 genes (after filtering in Galaxy?) for numerous group conditions (Used for Step 1)
+-   Contains raw counts of 56,980 genes  for numerous group conditions (Used for Step 1)
 
 [`meta.Rdata`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/Raw%20Files/meta.Rdata)
 
@@ -30,9 +30,6 @@ Next, please download the following files and place them into your working direc
 
 -   Color key for gene modules and creating plots (Steps 4 and 5).
 
-[`manual_go_terms.txt`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/Raw%20Files/manual_go_terms.txt)
-
--   For use in gene ontology analysis (Step 5).
 
 ## 3. R Scripts
 
@@ -44,11 +41,10 @@ Download and run the following files in your working directory:
 
 -   Perform quality control to remove lowly-expressed reads
 -   Sets up differential expression based on comparisons between sex, drug (fentanyl vs. saline), and VTA projection target (PFC, NAC, or INPUT (total VTA)).
--   Produces a `DEoutputp05` file that ???
--   Produces three `DEgenesummary` files for VTA-PFC, VTA-NAC, and VTA-INPUT genes.
--   *Note: Gene information for VTA to amygdala neurons (DEgene_summary_AMY) can be ignored. Although this RNASeq data contains VTA-AMY neuron information, this project does not consider AMY as a variable to create WGCNA networks.*
+-   Produces a `DEoutputp05` file that contains genes with nominal p<0.05
+-   Produces  `DEgenesummary` files for VTA-PFC, VTA-NAC, VTA-AMY, and VTA-INPUT genes.
 
-2.  [`WGCNA_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_PFC.R), [`WGCNA_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_NAC.R), and [`WGCNA_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_INPUT.R)
+2.  [`WGCNA_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_PFC.R), [`WGCNA_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_NAC.R),[`WGCNA_AMY.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_AMY.R), and [`WGCNA_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/WGCNA_INPUT.R),
 
 -   *Note: Mac users are recommended to download the* `netREGION_8.Rdata` *file respective to each VTA projection. The script will have two commented out lines of code that need to be run. Run those two lines and skip the rest of that section.*
 
@@ -72,7 +68,7 @@ Download and run the following files in your working directory:
 
 5.  [`go_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_PFC.R), [`go_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_NAC.R), [`go_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_INPUT.R)
 
--   *Note: Rerunning these GOst queries may be subject to change over time. For exact results, download the* `REGION_go_all_modules_cleaned_colorkey_7_30_2025.Rdata` *file respective to each VTA projection. The script will have a line of code where it will load it into your workspace.*
+-   *Note: Rerunning these GOst queries may be subject to change over time. For exact results, download the* `###REPLACE THIS FILE NAME#####` *file respective to each VTA projection. The script will have a line of code where it will load it into your workspace.*
 
 -   Performs gene ontology and KEGG analyses via gprofiler2. 
 

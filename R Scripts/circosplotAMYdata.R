@@ -50,37 +50,21 @@ write.table(all_modules, file = "AMY_circosdata_all_MEs.txt", row.names = FALSE,
 
 # CREATE A DATA TABLE FOR ANY SIGNIFICANT MODULES IN THE VTA-AMY ----------------------------------------------
 
-significant_modules <- bind_rows(
-  AMY_sexcomb_moduleEigengenesDE %>%
-    filter(P.Value < 0.05) %>%
-    dplyr::select(ModuleEigengene,logFC, P.Value),
-  
-  AMY_F_moduleEgigngenesDE %>%
-    filter(P.Value < 0.05) %>%
-    dplyr::select(ModuleEigengene),
-  
-  AMY_M_moduleEgigngenesDE %>%
-    filter(P.Value < 0.05) %>%
-    dplyr::select(ModuleEigengene )
-) %>%
-  distinct()
+significant_modules <- all_modules %>%
+  filter((P.Value_AMY_FENT < 0.05) |
+           (P.Value_AMY_F_FENT < 0.05) |
+           (P.Value_AMY_M_FENT < 0.05)) %>%
+  filter(ModuleEigengene != "ME0")
 
-#remove the negligible ME0 as it is not really a module and should not be considered significant
-significant_modules <- subset(significant_modules, ModuleEigengene != 'ME0') 
-
-#append the category of data to the columns so you know what it's referring to
-colnames(significant_modules)[c(2:3)] <- paste(colnames(significant_modules)[c(2:3)], 'AMY_FENT', sep = '_')
-
-#join female data
-significant_modules <- inner_join(significant_modules, female_data, by = "ModuleEigengene")
-
-#join male data (final version)
-significant_modules <- inner_join(significant_modules, male_data, by = "ModuleEigengene")
-
-#now, rearrange 
 significant_modules <- significant_modules %>%
-  dplyr::select(c(1, 2, 4, 6, 3, 5, 7))
+  dplyr::select(ModuleEigengene,
+                logFC_AMY_FENT, logFC_AMY_F_FENT, logFC_AMY_M_FENT,
+                P.Value_AMY_FENT, P.Value_AMY_F_FENT, P.Value_AMY_M_FENT)
 
+# Export significant modules
+write.table(significant_modules, 
+            file = "AMY_circosdata.txt",
+            row.names = FALSE, sep = "\t", col.names = TRUE, quote = FALSE)
 
 write.table(significant_modules, file = "AMY_circosdata.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
 

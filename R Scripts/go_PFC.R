@@ -16,7 +16,7 @@ library(tidyr)
 library(purrr)
 
 PFC_gene_summary <- read.table(paste0(workdir,"/PFC_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
-PFC_sig_modules <- c(52, 39, 42, 5, 23, 65, 11, 16, 25, 6, 63, 43, 4, 67, 66, 33, 68, 85)
+PFC_sig_modules <- c(10,65,7,60,29,40,18,66,4,11,.9,80,51,2,67,19,47,48,72,44,17,5,9)
 
 # Import the colors.txt to get color keys for the graphs
 colordir = ""

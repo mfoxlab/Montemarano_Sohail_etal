@@ -1,6 +1,7 @@
 # Creating data tables for circos plots
 # Hajra Sohail
 # 2025-06-13
+#2026-06-22 MEF UPDATE TO INCL M AND F SIG MODS TOO IN THE FILTERING
 
 # PATH DIRECTORY, LOAD FILES ----------------------------------------------
 workdir = ""
@@ -49,11 +50,22 @@ all_modules <- all_modules %>%
 
 write.table(all_modules, file = "INPUT_circosdata_all_MEs.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
 
-# CREATE A DATA TABLE FOR ALL SIGNIFICANT MODULES IN THE INPUT ----------------------------------------------
+# CREATE A DATA TABLE FOR ANY SIGNIFICANT MODULES IN THE INPUT ----------------------------------------------
 
-significant_modules <- INPUT_sexcomb_moduleEigengenesDE %>%
-  filter(P.Value < 0.05) %>%
-  dplyr::select('ModuleEigengene', logFC, P.Value)
+significant_modules <- bind_rows(
+  INPUT_sexcomb_moduleEigengenesDE %>%
+    filter(P.Value < 0.05) %>%
+    dplyr::select(ModuleEigengene,logFC, P.Value),
+  
+  INPUT_F_moduleEgigngenesDE %>%
+    filter(P.Value < 0.05) %>%
+    dplyr::select(ModuleEigengene),
+  
+  INPUT_M_moduleEgigngenesDE %>%
+    filter(P.Value < 0.05) %>%
+    dplyr::select(ModuleEigengene )
+) %>%
+  distinct()
 
 #remove the negligible ME0 as it is not really a module and should not be considered significant
 significant_modules <- subset(significant_modules, ModuleEigengene != 'ME0') 

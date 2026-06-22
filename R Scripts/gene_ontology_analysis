@@ -12,17 +12,17 @@ library(readr)
 load("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/counts.Rdata")
 load("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/meta.Rdata")
 
-# Get sample names that are NOT AMY
-keep_samples <- meta$samplenames[meta$target != "AMY"]
-counts_filtered <- counts[, keep_samples]
+
 
 #restrict gene universe to only genes we obtained in the seq run
-gene_universe <- unique(rownames(counts_filtered))
+gene_universe <- unique(rownames(counts))
 
 PFC_gene_summary <- read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/PFC_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
 PFC_sig_modules <- c(52,85,39,70,17,77,27,1,91,64,71,50,40,33,65,23,68,42,66,5,11,43,4,63,25,16,6,67)
 NAC_gene_summary <-read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/NAC_gene_summary.txt"), sep= "\t", header = TRUE, quote = '')
 NAC_sig_modules<-c(18,57,52,32,28,49,54,21,36,45,29,38,64,39)
+AMY_gene_summary<-read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/AMY_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
+AMY_sig_modules<-c() 
 #-------------------------------------------------------
 # Function to later convert Ensembl to mgi_symbols
 #--------------------------------------------------------

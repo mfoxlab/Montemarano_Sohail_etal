@@ -17,7 +17,7 @@ AMY_M_moduleEgigngenesDE <- read.table(paste0(workdirAMY, "/AMY_M_moduleEigengen
 AMY_F_moduleEgigngenesDE <- read.table(paste0(workdirAMY, "/AMY_F_moduleEigengenesDE.txt"), sep = '\t', header = TRUE, quote = '')
 
 
-# CREATE A DATA TABLE FOR ALL MODULES IN THE AMY ----------------------------------------------
+# CREATE A DATA TABLE FOR ALL MODULES IN THE VTA- AMY ----------------------------------------------
 
 all_modules <- AMY_sexcomb_moduleEigengenesDE %>%
   dplyr::select('ModuleEigengene', logFC, P.Value)
@@ -48,11 +48,22 @@ all_modules <- all_modules %>%
 
 write.table(all_modules, file = "AMY_circosdata_all_MEs.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
 
-# CREATE A DATA TABLE FOR ALL SIGNIFICANT MODULES IN THE AMY ----------------------------------------------
+# CREATE A DATA TABLE FOR ANY SIGNIFICANT MODULES IN THE VTA-AMY ----------------------------------------------
 
-significant_modules <- AMY_sexcomb_moduleEigengenesDE %>%
-  filter(P.Value < 0.05) %>%
-  dplyr::select('ModuleEigengene', logFC, P.Value)
+significant_modules <- bind_rows(
+  AMY_sexcomb_moduleEigengenesDE %>%
+    filter(P.Value < 0.05) %>%
+    dplyr::select(ModuleEigengene,logFC, P.Value),
+  
+  AMY_F_moduleEgigngenesDE %>%
+    filter(P.Value < 0.05) %>%
+    dplyr::select(ModuleEigengene),
+  
+  AMY_M_moduleEgigngenesDE %>%
+    filter(P.Value < 0.05) %>%
+    dplyr::select(ModuleEigengene )
+) %>%
+  distinct()
 
 #remove the negligible ME0 as it is not really a module and should not be considered significant
 significant_modules <- subset(significant_modules, ModuleEigengene != 'ME0') 

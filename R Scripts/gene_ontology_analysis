@@ -6,7 +6,7 @@ library(tidyr)
 library(purrr)
 library(readr)
 
-
+#Used gprofiler version e114_eg62_p19_27110d83
 
 #load counts data to determine the size of our overall gene universe from the seq experiments
 load("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/counts.Rdata")

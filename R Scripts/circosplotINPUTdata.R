@@ -52,37 +52,16 @@ write.table(all_modules, file = "INPUT_circosdata_all_MEs.txt", row.names = FALS
 
 # CREATE A DATA TABLE FOR ANY SIGNIFICANT MODULES IN THE INPUT ----------------------------------------------
 
-significant_modules <- bind_rows(
-  INPUT_sexcomb_moduleEigengenesDE %>%
-    filter(P.Value < 0.05) %>%
-    dplyr::select(ModuleEigengene,logFC, P.Value),
-  
-  INPUT_F_moduleEgigngenesDE %>%
-    filter(P.Value < 0.05) %>%
-    dplyr::select(ModuleEigengene),
-  
-  INPUT_M_moduleEgigngenesDE %>%
-    filter(P.Value < 0.05) %>%
-    dplyr::select(ModuleEigengene )
-) %>%
-  distinct()
+significant_modules <- all_modules %>%
+  filter((P.Value_INPUT_FENT < 0.05) |
+           (P.Value_INPUT_F_FENT < 0.05) |
+           (P.Value_INPUT_M_FENT < 0.05)) %>%
+  filter(ModuleEigengene != "ME0")
 
-#remove the negligible ME0 as it is not really a module and should not be considered significant
-significant_modules <- subset(significant_modules, ModuleEigengene != 'ME0') 
-
-#append the category of data to the columns so you know what it's referring to
-colnames(significant_modules)[c(2:3)] <- paste(colnames(significant_modules)[c(2:3)], 'INPUT_FENT', sep = '_')
-
-#join female data
-significant_modules <- inner_join(significant_modules, female_data, by = "ModuleEigengene")
-
-#join male data (final version)
-significant_modules <- inner_join(significant_modules, male_data, by = "ModuleEigengene")
-
-#now, rearrange 
 significant_modules <- significant_modules %>%
-  dplyr::select(c(1, 2, 4, 6, 3, 5, 7))
-
+  dplyr::select(ModuleEigengene,
+                logFC_INPUT_FENT, logFC_INPUT_F_FENT, logFC_INPUT_M_FENT,
+                P.Value_INPUT_FENT, P.Value_INPUT_F_FENT, P.Value_INPUT_M_FENT)
 
 write.table(significant_modules, file = "INPUT_circosdata.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
 

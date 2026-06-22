@@ -16,7 +16,7 @@ library(tidyr)
 library(purrr)
 
 NAC_gene_summary <- read.table(paste0(workdir,"/NAC_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
-NAC_sig_modules <- c(39, 38, 57, 64, 18, 52)
+NAC_sig_modules <- c(52,40,27,18,50,22,65,55,42,61,46,34)
 
 # Import the colors.txt to get color keys for the graphs
 colordir = ""

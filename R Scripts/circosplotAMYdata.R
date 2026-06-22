@@ -66,9 +66,5 @@ write.table(significant_modules,
             file = "AMY_circosdata.txt",
             row.names = FALSE, sep = "\t", col.names = TRUE, quote = FALSE)
 
-write.table(significant_modules, file = "AMY_circosdata.txt", row.names = FALSE, sep = '\t', col.names = TRUE, quote = FALSE)
-
-
-
 # Save the workspace
 save.image(file = paste0(workdir, "/circosplotAMYdataworkspace.Rdata"))

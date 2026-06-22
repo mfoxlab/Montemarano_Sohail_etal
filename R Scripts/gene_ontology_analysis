@@ -22,7 +22,7 @@ PFC_sig_modules <- c(52,85,39,70,17,77,27,1,91,64,71,50,40,33,65,23,68,42,66,5,1
 NAC_gene_summary <-read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/NAC_gene_summary.txt"), sep= "\t", header = TRUE, quote = '')
 NAC_sig_modules<-c(18,57,52,32,28,49,54,21,36,45,29,38,64,39)
 AMY_gene_summary<-read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/AMY_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
-AMY_sig_modules<-c() 
+AMY_sig_modules<-c(1,66,5,67,31,13,33,43,6,62,17,14,58,44,19,11,39,23,26,21) 
 #-------------------------------------------------------
 # Function to later convert Ensembl to mgi_symbols
 #--------------------------------------------------------
@@ -424,4 +424,198 @@ NAC_go_filtered <- NAC_go_all_modules_cleaned %>%
   dplyr::select(-has_small_term)
 
 readr::write_tsv(NAC_go_filtered, "restrictedgeneuniverseNACGOfilteredbybroadterms.tsv")
+
+#---------------------
+#AMY
+#-----------------------------
+
+AMY_each_go_result <- list()
+total_modules<-length(AMY_sig_modules)
+for (i in seq_along(AMY_sig_modules)) {
+  
+  module <- AMY_sig_modules[i]
+  
+  message(
+    sprintf(
+      "[%d/%d] Running module %s...",
+      i, total_modules, module
+    )
+  )
+  
+  
+  current_module <- AMY_gene_summary %>%
+    filter(module.AMY == module) %>%
+    dplyr::select(ensembl_gene_id) %>%  
+    distinct() %>%
+    pull()
+ 
+   # Store original IDs
+  original_module <- current_module
+
+   #clean up ensemblIDs if needed
+  cleaned_module <- sub("\\..*", "", original_module)
+   # Report genes that were altered by cleaning
+   changed_ids <- original_module[original_module != cleaned_module]
+   
+   if (length(changed_ids) > 0) {
+     message(
+       paste0(
+         "Module ", module, ": ",
+         length(changed_ids),
+         " genes had version numbers removed."
+       )
+     )
+   }
+   
+   # Identify genes not in universe
+   missing_from_universe <- cleaned_module[!cleaned_module %in% gene_universe]
+   
+   if (length(missing_from_universe) > 0) {
+     message(
+       paste0(
+         "Module ", module, ": ",
+         length(missing_from_universe),
+         " genes not found in background universe."
+       )
+     )
+   }
+   
+   # Keep only valid genes
+   current_module <- cleaned_module[cleaned_module %in% gene_universe]
+   
+   message(
+     paste0(
+       "Module ", module, 
+       ": ", length(current_module), 
+       " genes entering GO analysis."
+     )
+   )
+  
+   # Run GO with custom background
+  gost_result <- gost(
+    query             = current_module,
+    organism          = "mmusculus",
+    sources           = c("GO:BP", "GO:CC", "GO:MF"),
+    correction_method = "fdr", 
+    significant       = TRUE, 
+    evcodes           = TRUE,
+    user_threshold    = 0.05,
+    custom_bg         = gene_universe,
+    domain_scope      = "custom"
+  )
+  
+  # Add module label if results exist
+  if (!is.null(gost_result) && !is.null(gost_result$result)) {
+    
+    gost_result_df <- gost_result$result
+    gost_result_df$module <- module
+    
+    AMY_each_go_result[[as.character(module)]] <- gost_result_df
+    
+  } else {
+    
+    message(paste("Module", module, "outputted a NULL result"))
+    
+  }
+  message(paste0("Module ", module, " complete.\n"))
+}
+AMY_go_all_modules <- bind_rows(AMY_each_go_result)
+
+AMY_go_all_modules_cleaned <- AMY_go_all_modules %>%
+  dplyr::select(-query) %>%
+  dplyr::select(module, everything(), -significant, significant) %>%
+  mutate(intersection = gsub(",", "|", intersection),
+         evidence_codes = gsub(",", "|", evidence_codes))
+
+AMY_go_all_modules_cleaned <- AMY_go_all_modules_cleaned %>%
+  rowwise() %>%
+  mutate(intersection = convert_ensembl_to_mgi(intersection, ensembl_to_mgi)) %>%
+  ungroup()
+
+readr::write_tsv(AMY_go_all_modules_cleaned, "restrictedGeneUniverseAMYGO.tsv")
+
+
+#----------------------
+# KEGG NOW
+#-------------------
+
+AMY_each_KEGG_result<-list()
+
+for (i in seq_along(AMY_sig_modules)) {
+  
+  module <- AMY_sig_modules[i]
+  
+  message(
+    sprintf(
+      "[%d/%d] Running module %s...",
+      i, total_modules, module
+    )
+  )
+  
+  
+  current_module <- AMY_gene_summary %>%
+    filter(module.AMY == module) %>%
+    dplyr::select(ensembl_gene_id) %>%  
+    distinct() %>%
+    pull()
+  
+ 
+  # Run GO with custom background
+  gost_result_KEGG <- gost(
+    query             = current_module,
+    organism          = "mmusculus",
+    sources           = c("KEGG"),
+    correction_method = "fdr", 
+    significant       = TRUE, 
+    evcodes           = TRUE,
+    user_threshold    = 0.05,
+    custom_bg         = gene_universe,
+    domain_scope      = "custom"
+  )
+  
+  # Add module label if results exist
+  if (!is.null(gost_result_KEGG) && !is.null(gost_result_KEGG$result)) {
+    
+    gost_result_KEGG_df <- gost_result_KEGG$result
+    gost_result_KEGG_df$module <- module
+    
+    AMY_each_KEGG_result[[as.character(module)]] <- gost_result_KEGG_df
+    
+  } else {
+    
+    message(paste("Module", module, "outputted a NULL result"))
+    
+  }
+  message(paste0("Module ", module, " complete.\n"))
+}
+AMY_KEGG_all_modules <- bind_rows(AMY_each_KEGG_result)
+
+AMY_KEGG_all_modules_cleaned <- AMY_KEGG_all_modules %>%
+  dplyr::select(-query) %>%
+  dplyr::select(module, everything(), -significant, significant) %>%
+  dplyr::filter(term_id != "KEGG:00000")%>%
+  mutate(intersection = gsub(",", "|", intersection),
+         evidence_codes = gsub(",", "|", evidence_codes))
+
+AMY_KEGG_all_modules_cleaned <- AMY_KEGG_all_modules_cleaned %>%
+  rowwise() %>%
+  mutate(intersection = convert_ensembl_to_mgi(intersection, ensembl_to_mgi)) %>%
+  ungroup()
+
+readr::write_tsv(AMY_KEGG_all_modules_cleaned, "restrictedGeneUniverseAMYKEGG.tsv")
+
+#----------------------
+#filter out overly ginormous and uninformative GO terms
+#--------------------------------
+
+AMY_go_filtered <- AMY_go_all_modules_cleaned %>%
+  group_by(module) %>%
+  # mark modules that have at least one small term
+  dplyr::mutate(has_small_term = any(term_size <= 500)) %>%
+  ungroup() %>%
+  # keep all small terms, and broad terms only if module has no small terms
+ dplyr::filter(term_size <= 500 | (!has_small_term & term_size > 500)) %>%
+  dplyr::select(-has_small_term)
+
+readr::write_tsv(AMY_go_filtered, "restrictedgeneuniverseAMYGOfilteredbybroadterms.tsv")
 

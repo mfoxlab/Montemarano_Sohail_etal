@@ -1,7 +1,7 @@
 # Set up differential expression and remove genes that do not have at least 1 CPM in at least 2 samples   
 # Hajra Sohail
 # 2025-06-12
-
+#2026-06-22- updated to put the VTA-AMY samples back into the DEG analysis etc. mef 
 
 # SETUP ------------------------------------------------------------------------------------------
 
@@ -117,6 +117,15 @@ contr = makeContrasts(
   INPUT_FENT=	(INPUTFFENT+INPUTMFENT)/2-(INPUTFSAL+INPUTMSAL)/2, 
   NAC_PFC_FENT = (NACFFENT+NACMFENT)/2-(PFCFFENT+PFCMFENT)/2,
   NAC_PFC_SAL = (NACFSAL+NACMSAL)/2-(PFCFSAL+PFCMSAL)/2,
+  AMY_F_FENT =	(AMYFFENT-AMYFSAL),
+  AMY_M_FENT=	(AMYMFENT-AMYMSAL),
+  AMY_FENT=	(AMYFFENT+AMYMFENT)/2-(AMYFSAL+AMYMSAL)/2,
+  AMY_FENT_INPUT=	(AMYFFENT+AMYMFENT)/2-(INPUTFFENT+INPUTMFENT)/2,
+  AMY_SAL_INPUT=	(AMYFSAL+AMYMSAL)/2 - (INPUTFSAL+INPUTMSAL)/2,
+  NAC_AMY_FENT=(NACFFENT+NACMFENT)/2-(AMYFFENT+AMYMFENT)/2,
+  AMY_PFC_FENT=(AMYFFENT+AMYMFENT)/2-(PFCFFENT+PFCMFENT)/2,
+  NAC_AMY_SAL=(NACFSAL+NACMSAL)/2-(AMYFSAL+AMYMSAL)/2,
+  AMY_PFC_SAL = (AMYFSAL+AMYMSAL)/2-(PFCFSAL+PFCMSAL)/2,
   levels=design)
 
 fit1a = contrasts.fit(fit1, contr) 
@@ -136,6 +145,15 @@ res1 = merge(res1, topTable(fit1a, coef = 12, number = Inf), by.x = "Row.names",
 res1 = merge(res1, topTable(fit1a, coef = 13, number = Inf), by.x = "Row.names", by.y = 0, suffixes = c("", ".coef13"))
 res1 = merge(res1, topTable(fit1a, coef = 14, number = Inf), by.x = "Row.names", by.y = 0, suffixes = c("", ".coef14"))
 res1 = merge(res1, topTable(fit1a, coef = 15, number = Inf), by.x = "Row.names", by.y = 0, suffixes = c("", ".coef15"))
+res1 = merge(res1,topTable(fit1a,coef=16, number=Inf),by.x="Row.names", by.y = 0, suffixes = c("", ".coef16"))
+res1 = merge(res1,topTable(fit1a,coef=17,number=Inf), by.x="Row.names", by.y = 0, suffixes = c("", ".coef17"))
+res1 = merge(res1,topTable(fit1a,coef=18,number=Inf),by.x="Row.names", by.y = 0, suffixes = c("", ".coef18"))
+res1 = merge(res1,topTable(fit1a,coef=19,number=Inf),by.x="Row.names", by.y = 0, suffixes = c("", ".coef19"))
+res1 = merge(res1,topTable(fit1a,coef=20,number=Inf),by.x="Row.names", by.y = 0, suffixes = c("", ".coef20"))
+res1 = merge(res1,topTable(fit1a,coef=21,number=Inf),by.x="Row.names", by.y = 0, suffixes = c("", ".coef21"))
+res1 = merge(res1,topTable(fit1a,coef=22,number=Inf),by.x="Row.names", by.y = 0, suffixes = c("", ".coef22"))
+res1 = merge(res1,topTable(fit1a,coef=23,number=Inf),by.x="Row.names", by.y = 0, suffixes = c("", ".coef23"))
+res1 = merge(res1,topTable(fit1a,coef=24,number=Inf),by.x="Row.names", by.y = 0, suffixes = c("", ".coef24"))
 
 n = ncol(contr) 
 limma.pvals = res1[, c(1:n * 6 - 1)]   #extract p value
@@ -182,14 +200,14 @@ sig.genes.fdr=list()
 for(i in target) { sig.genes.fdr[[i]] = rownames(limma.fdr)[rowSums(limma.fdr[,grep(i,colnames(limma.fdr))] <=0.1)>0]}
 cbind(genepval=lapply(sig.genes.pval,length),genefdr=lapply(sig.genes.fdr,length))
 
-#
-# results here
-#       genepval genefdr
-# PFC   18801    9658   
-# AMY   0        0      
-# INPUT 18888    11169  
-# NAC   18666    10352  
-#
+#results here  
+#    genepval genefdr
+#PFC   39798    12665  
+#AMY   38794    12821  
+#INPUT 42780    15029  
+#NAC   39094    13329
+
+
 
 #write  genes p<0.05
 sigGenes.tab = lapply(1:length(target), function(i) { data.frame(ensembl_gene_id = sig.genes.pval[[target[i]]], limma.pvals[sig.genes.pval[[target[i]]], grep(target[i], colnames(limma.pvals))], limma.logFC[sig.genes.pval[[target[i]]], grep(target[i], colnames(limma.pvals))]) }) 

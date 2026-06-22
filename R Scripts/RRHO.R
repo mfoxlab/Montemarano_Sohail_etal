@@ -1,7 +1,7 @@
+#2026-06-22 updated to reintroduce the Vta-amy samples and comparisons 
 workdir = ""
 setwd(workdir)
 load(file = paste0(workdir,"/RRHO_workspace.Rdata"))
-
 load(file = paste0(workdir,"/DEoutputNOP.Rdata"))
 
 library(RRHO2)
@@ -42,20 +42,27 @@ for (df_name in names(DEoutp)) {
 }
 
 
-NACFMRRHO <- RRHO2_initialize(RRHO_NAC_F_FENT,RRHO_NAC_M_FENT, labels=c("FEM NAC","MALE NAC"), log10.ind=TRUE)
-PFCFMRRHO <- RRHO2_initialize(RRHO_PFC_F_FENT,RRHO_PFC_M_FENT, labels=c("FEM PFC","MALE PFC"), log10.ind=TRUE)
-INPUTFMRRHO <- RRHO2_initialize(RRHO_INPUT_F_FENT,RRHO_INPUT_M_FENT, labels=c("FEM INPUT","MALE INPUT"), log10.ind=TRUE)
-NACPFCFENTRRHO <- RRHO2_initialize(RRHO_NAC_FENT,RRHO_PFC_FENT, labels=c("NAC FENT","PFC FENT"), log10.ind=TRUE)
+#each  vs input
 NACINPUTFENTRRHO <- RRHO2_initialize(RRHO_NAC_FENT,RRHO_INPUT_FENT, labels=c("NAC FENT","INPUT FENT"), log10.ind=TRUE)
 PFCINPUTFENTRRHO <- RRHO2_initialize(RRHO_PFC_FENT,RRHO_INPUT_FENT, labels=c("PFC FENT","INPUT FENT"), log10.ind=TRUE)
+AMYINPUTFENTRRHO<- RRHO2_initialize(RRHO_AMY_FENT, RRHO_INPUT_FENT, labels=c("AMY FENT", "INPUT FENT"), log10.ind=TRUE)
 
+#each projection vs the other- amy v pfc,  nac v pfc, amy v nac
+AMYPFCFENTRRHO<-RRHO2_initialize(RRHO_AMY_FENT, RRHO_PFC_FENT, labels=c("AMY FENT", "PFC FENT", log10.ind=TRUE)
+NACPFCFENTRRHO <- RRHO2_initialize(RRHO_NAC_FENT,RRHO_PFC_FENT, labels=c("NAC FENT","PFC FENT"), log10.ind=TRUE)
+AMYNACFENTRRHO<- RRHO2_initialize (RRHO_AMY_FENT, RRHO_NAC_FENT, labels =c("AMY FENT" ,"NAC FENT"), log10.ind=TRUE)
+                                 
 
+'''
 # EXTRA RRHOs
 NACPFCMRRHO <- RRHO2_initialize(RRHO_NAC_M_FENT,RRHO_PFC_M_FENT, labels=c("MALE NAC","MALE PFC"), log10.ind=TRUE)
 NACINPUTMRRHO <- RRHO2_initialize(RRHO_NAC_M_FENT,RRHO_INPUT_M_FENT, labels=c("MALE NAC","MALE INPUT"), log10.ind=TRUE)
 NACINPUTFRRHO <- RRHO2_initialize(RRHO_NAC_F_FENT,RRHO_INPUT_F_FENT, labels=c("FEM NAC","FEM INPUT"), log10.ind=TRUE)
 NACPFCFRRHO <- RRHO2_initialize(RRHO_NAC_F_FENT,RRHO_PFC_F_FENT, labels=c("FEM NAC","FEM PFC"), log10.ind=TRUE)
-
+NACFMRRHO <- RRHO2_initialize(RRHO_NAC_F_FENT,RRHO_NAC_M_FENT, labels=c("FEM NAC","MALE NAC"), log10.ind=TRUE)
+PFCFMRRHO <- RRHO2_initialize(RRHO_PFC_F_FENT,RRHO_PFC_M_FENT, labels=c("FEM PFC","MALE PFC"), log10.ind=TRUE)
+INPUTFMRRHO <- RRHO2_initialize(RRHO_INPUT_F_FENT,RRHO_INPUT_M_FENT, labels=c("FEM INPUT","MALE INPUT"), log10.ind=TRUE)
+'''
 
 # WRITING ALL THE TABLES
 
@@ -90,19 +97,6 @@ for (obj_name in rrho_objects) {
 
 
 # WRITING PDFs
-
-pdf("NACFM_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(NACFMRRHO)
-dev.off()
-
-pdf("PFCFM_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(PFCFMRRHO)
-dev.off()
-
-pdf("INPUTFM_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(INPUTFMRRHO)
-dev.off()
-
 pdf("NACPFCFENT_RRHO.pdf", width = 9.5, height = 7)
 RRHO2_heatmap(NACPFCFENTRRHO)
 dev.off()
@@ -111,84 +105,31 @@ pdf("NACINPUTFENT_RRHO.pdf", width = 9.5, height = 7)
 RRHO2_heatmap(NACINPUTFENTRRHO)
 dev.off()
 
-
 pdf("PFCINPUTFENT_RRHO.pdf", width = 9.5, height = 7)
 RRHO2_heatmap(PFCINPUTFENTRRHO)
 dev.off()
 
+pdf("AMYINPUTFENT_RRHO.pdf", width = 9.5, height = 7)
+RRHO2_heatmap(AMYINPUTFENTRRHO)
+dev.off()                     
 
-# Other RRHOs
-pdf("NACPFCM_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(NACPFCMRRHO)
+pdf("AMYPFCFENT_RRHO.pdf", width = 9.5, height = 7)
+RRHO2_heatmap(AMYPFCFENTRRHO)
+dev.off() 
+
+pdf("AMYNACFENT_RRHO.pdf", width=9.5, height = 7)                                 
+RRHO2_heatmap(AMYNACFENTRRHO)
 dev.off()
 
-pdf("NACINPUTM_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(NACINPUTMRRHO)
-dev.off()
-
-pdf("NACINPUTF_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(NACINPUTFRRHO)
-dev.off()
-
-
-
-pdf("NACPFCF_RRHO.pdf", width = 9.5, height = 7)
-RRHO2_heatmap(NACPFCFRRHO)
-dev.off()
-
-
+'''
 #EXTRA VENN DIAGRAMS
-# First four regions FM 
-
-RRHO2_vennDiagram(NACFMRRHO, type="ud")
-RRHO2_vennDiagram(NACFMRRHO, type="dd")
-RRHO2_vennDiagram(NACFMRRHO, type="uu")
-
-RRHO2_vennDiagram(PFCFMRRHO, type="ud")
-RRHO2_vennDiagram(PFCFMRRHO, type="dd")
-RRHO2_vennDiagram(PFCFMRRHO, type="uu")
-
-RRHO2_vennDiagram(INPUTFMRRHO, type="ud")
-RRHO2_vennDiagram(INPUTFMRRHO, type="dd")
-RRHO2_vennDiagram(INPUTFMRRHO, type="uu")
-
-
-# COMBINATIONS
-
-#NAC
 RRHO2_vennDiagram(NACPFCFENTRRHO, type="ud")
 RRHO2_vennDiagram(NACPFCFENTRRHO, type="dd")
 RRHO2_vennDiagram(NACPFCFENTRRHO, type="uu")
-
-RRHO2_vennDiagram(NACINPUTFENTRRHO, type="ud")
-RRHO2_vennDiagram(NACINPUTFENTRRHO, type="dd")
-RRHO2_vennDiagram(NACINPUTFENTRRHO, type="uu")
-
-#PFC
-RRHO2_vennDiagram(PFCINPUTFENTRRHO, type="ud")
-RRHO2_vennDiagram(PFCINPUTFENTRRHO, type="dd")
-RRHO2_vennDiagram(PFCINPUTFENTRRHO, type="uu")
-
-
-#EXTRA RRHOS
-RRHO2_vennDiagram(NACPFCMRRHO, type="ud")
-RRHO2_vennDiagram(NACPFCMRRHO, type="dd")
-RRHO2_vennDiagram(NACPFCMRRHO, type="uu")
+'''
 
 
 
-RRHO2_vennDiagram(NACINPUTMRRHO, type="ud")
-RRHO2_vennDiagram(NACINPUTMRRHO, type="dd")
-RRHO2_vennDiagram(NACINPUTMRRHO, type="uu")
-
-RRHO2_vennDiagram(NACINPUTFRRHO, type="ud")
-RRHO2_vennDiagram(NACINPUTFRRHO, type="dd")
-RRHO2_vennDiagram(NACINPUTFRRHO, type="uu")
-
-
-
-RRHO2_vennDiagram(NACAMYFRRHO, type="ud")
-RRHO2_vennDiagram(NACAMYFRRHO, type="dd")
 RRHO2_vennDiagram(NACAMYFRRHO, type="uu")
  
 save.image(file = paste0(workdir,"/RRHO_workspace.Rdata"))

@@ -1,6 +1,7 @@
 # Gene Ontology Analysis
 # Hajra Sohail
 # 2025-07-30
+#2026-06-22 MEF update to include sex-specific modules 
 
 # PATH DIRECTORY, LOAD FILES ----------------------------------------------
 workdir = ""
@@ -16,7 +17,7 @@ library(tidyr)
 library(purrr)
 
 INPUT_gene_summary <- read.table(paste0(workdir,"/INPUT_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
-INPUT_sig_modules <- c(24, 22, 16)
+INPUT_sig_modules <- c(24, 22, 16) ## meg this is where you need to change the Ms included
 
 # Import the colors.txt to get color keys for the graphs
 colordir = ""

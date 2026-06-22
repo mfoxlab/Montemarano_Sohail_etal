@@ -66,7 +66,7 @@ Download and run the following files in your working directory:
 
 -   Run this entire script at once (as objects in this environment are overwritten to create each new plot).
 
-5.  [`go_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_PFC.R), [`go_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_NAC.R), [`go_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_INPUT.R), [`go_AMY.R`]
+5.  [`go_PFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_PFC.R), [`go_NAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_NAC.R), [`go_INPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_INPUT.R), [`go_AMY.R`] (https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/go_AMY.R)
 
 -   *Note: Rerunning these GOst queries may be subject to change over time. For exact results, download the* `###REPLACE THIS FILE NAME#####` *file respective to each VTA projection. The script will have a line of code where it will load it into your workspace.*
 

@@ -55,7 +55,7 @@ Download and run the following files in your working directory:
 
 -   Organizes data to be used in circos plots. Merges log fold-change and P-Value data from sex-combined data with female and male data.
 
-4.  [`circosplotPFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotPFC.R), [`circosplotNAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotNAC.R), and [`circosplotINPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotINPUT.R)
+4.  [`circosplotPFC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotPFC.R), [`circosplotNAC.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotNAC.R),[`circosplotAMY.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotAMY.R), and [`circosplotINPUT.R`](https://github.com/mfoxlab/Montemarano_Sohail_etal/blob/main/R%20Scripts/circosplotINPUT.R)
 
 -   Generates four PDF plots:
 

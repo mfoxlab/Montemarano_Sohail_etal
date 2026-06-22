@@ -104,10 +104,11 @@ top_50_1vsvAll_markers_list<-lapply(top_50_1vsAll_markers_list,as_tibble)
 #-------------------------------
 # key columns for filtering
 #-------------------------------
-pval_col_sal <- c(PFC = "P.Value_PFC_SAL_INPUT", NAC = "P.Value_NAC_SAL_INPUT")
-logFC_col_sal <- c(PFC = "logFC_PFC_SAL_INPUT", NAC = "logFC_NAC_SAL_INPUT")
-pval_col_fent<-c(PFC="P.Value_PFC_FENT", NAC = "P.Value_NAC_FENT")
-logFC_col_fent<-c(PFC= "logFC_PFC_FENT", NAC= "logFC_NAC_FENT")
+pval_col_sal <- c(PFC = "P.Value_PFC_SAL_INPUT", NAC = "P.Value_NAC_SAL_INPUT", AMY = "P.Value_AMY_SAL_INPUT")
+logFC_col_sal <- c(PFC = "logFC_PFC_SAL_INPUT", NAC = "logFC_NAC_SAL_INPUT", AMY = "logFC_AMY_SAL_INPUT")
+pval_col_fent<-c(PFC="P.Value_PFC_FENT", NAC = "P.Value_NAC_FENT", AMY="P.Value_AMY_FENT")
+logFC_col_fent<-c(PFC= "logFC_PFC_FENT", NAC= "logFC_NAC_FENT", AMY= "logFC_AMY_FENT")
+
 
 
 #-------------------------------

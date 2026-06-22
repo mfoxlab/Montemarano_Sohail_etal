@@ -17,7 +17,7 @@ library(tidyr)
 library(purrr)
 
 INPUT_gene_summary <- read.table(paste0(workdir,"/INPUT_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
-INPUT_sig_modules <- c(24, 22, 16) ## meg this is where you need to change the Ms included
+INPUT_sig_modules <- c(23) ## check that this is correct after generating the list 
 
 # Import the colors.txt to get color keys for the graphs
 colordir = ""

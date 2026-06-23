@@ -17,6 +17,8 @@ load("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/meta.Rdata")
 #restrict gene universe to only genes we obtained in the seq run
 gene_universe <- unique(rownames(counts))
 
+##NOTE TO MEGHAN-- PLEASE REPLACE THIS CODE WITH WHAT YOU ACTUALLY RAN (EXCEPT THE STRANGE EXCEPTION FOR THE AMY- JUST GET RID OF THAT AND FORMAT IT AS IF WE DID IT RIGHT THE FIRST TIME ###
+
 PFC_gene_summary <- read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/PFC_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
 PFC_sig_modules <- c(52,85,39,70,17,77,27,1,91,64,71,50,40,33,65,23,68,42,66,5,11,43,4,63,25,16,6,67)
 NAC_gene_summary <-read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/NAC_gene_summary.txt"), sep= "\t", header = TRUE, quote = '')

@@ -18,13 +18,14 @@ load("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/meta.Rdata")
 gene_universe <- unique(rownames(counts))
 
 ##NOTE TO MEGHAN-- PLEASE REPLACE THIS CODE WITH WHAT YOU ACTUALLY RAN (EXCEPT THE STRANGE EXCEPTION FOR THE AMY- JUST GET RID OF THAT AND FORMAT IT AS IF WE DID IT RIGHT THE FIRST TIME ###
+##Note by Annalisa: REGION_sig_modules are up to date as of 8-13-2026
 
 PFC_gene_summary <- read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/PFC_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
-PFC_sig_modules <- c(52,85,39,70,17,77,27,1,91,64,71,50,40,33,65,23,68,42,66,5,11,43,4,63,25,16,6,67)
+PFC_sig_modules <- c(10,11,17,18,19,2,29,39,40,43,44,47,48,5,51,60,65,66,67,7,72,80,9)
 NAC_gene_summary <-read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/NAC_gene_summary.txt"), sep= "\t", header = TRUE, quote = '')
-NAC_sig_modules<-c(18,57,52,32,28,49,54,21,36,45,29,38,64,39)
+NAC_sig_modules<-c(52,40,27,18,50,22,65,55,42,61,46,34)
 AMY_gene_summary<-read.table(paste0("~/FOX LAB DATA/Projection specific ribo seq fentanyl ip/AMY_gene_summary.txt"), sep = '\t', header = TRUE, quote = '')
-AMY_sig_modules<-c(1,66,5,67,31,13,33,43,6,62,17,14,58,44,19,11,39,23,26,21) 
+AMY_sig_modules<-c(1,11,13,14,17,19,21,23,26,31,33,39,41,44,5,58,6,62,66,67) 
 #-------------------------------------------------------
 # Function to later convert Ensembl to mgi_symbols
 #--------------------------------------------------------
